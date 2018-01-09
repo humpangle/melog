@@ -3,6 +3,10 @@ defmodule Melog.Accouts.User do
   import Ecto.Changeset
   alias Melog.Accouts.User
 
+  @timestamps_opts [
+    type: Timex.Ecto.DateTime,
+    autogenerate: {Timex.Ecto.DateTime, :autogenerate, []}
+  ]
 
   schema "users" do
     field :email, :string

@@ -40,7 +40,15 @@ defmodule Melog.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:plug_static_index_html, "~> 1.0"},
+      {:timex, "~> 3.1.24"},
+      {:timex_ecto, "~> 3.2.1"},
+      {:absinthe, "~> 1.4.6"},
+      {:absinthe_plug, "~> 1.4"},
+      {:ex_machina, "~> 2.1"},
+      {:guardian, "~> 1.0"},
+      {:comeonin, "~> 4.0"},
     ]
   end
 

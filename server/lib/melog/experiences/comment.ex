@@ -3,6 +3,10 @@ defmodule Melog.Experiences.Comment do
   import Ecto.Changeset
   alias Melog.Experiences.Comment
 
+  @timestamps_opts [
+    type: Timex.Ecto.DateTime,
+    autogenerate: {Timex.Ecto.DateTime, :autogenerate, []}
+  ]
 
   schema "comments" do
     field :text, :string

@@ -3,6 +3,10 @@ defmodule Melog.Experiences.Experience do
   import Ecto.Changeset
   alias Melog.Experiences.Experience
 
+  @timestamps_opts [
+    type: Timex.Ecto.DateTime,
+    autogenerate: {Timex.Ecto.DateTime, :autogenerate, []}
+  ]
 
   schema "experiences" do
     field :intro, :string
