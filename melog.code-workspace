@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"name": "Server",
+			"path": "server"
+		},
+		{
+			"path": "client",
+			"name": "Client"
+		}
+		// ,
+		// {
+		// 	"name": "Root",
+		// 	"path": "."
+		// }
+	],
+	"settings": {
+		"typescript.tsdk": "Client/node_modules/typescript/lib"
+	}
+}

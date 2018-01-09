@@ -1,0 +1,227 @@
+{
+  "version": "2.0.0",
+  "presentation": {
+    "reveal": "always",
+    "panel": "new"
+  },
+  "tasks": [
+    {
+      "label": "mix compile win",
+      "type": "shell",
+      "command": "dev.bat && mix compile",
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "mix compile deb",
+      "type": "shell",
+      "command": "mix compile",
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "mix get compile win",
+      "type": "shell",
+      "command": "dev.bat && mix do deps.get, compile",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "mix get compile deb",
+      "type": "shell",
+      "command": "mix do deps.get, compile",
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "mix test unit win",
+      "type": "shell",
+      "command": "dev.bat && mix test",
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "mix test unit deb",
+      "type": "shell",
+      "command": "mix test",
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "mix test file unit",
+      "type": "shell",
+      "command": "mix test ${file}",
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "mix test integration win",
+      "type": "shell",
+      "command": "dev.bat && cd ..\\front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
+          "CLIENT_API_URL": "http://localhost:4016/api"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "mix test integration deb",
+      "type": "shell",
+      "command": "cd ../front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
+          "CLIENT_API_URL": "http://localhost:4016/api"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "mix test integration no build win",
+      "type": "shell",
+      "command": "dev.bat && mix test --only integration",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "mix test integration no build deb",
+      "type": "shell",
+      "command": "mix test --only integration",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "mix test file integration win",
+      "type": "shell",
+      "command": "cd ..\\front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration ${file}",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
+          "CLIENT_API_URL": "http://localhost:4016/api"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "mix test file integration deb",
+      "type": "shell",
+      "command": "cd ../front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration ${file}",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
+          "CLIENT_API_URL": "http://localhost:4016/api"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "mix test file integration no build",
+      "type": "shell",
+      "command": "mix test --only integration ${file}",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "test"
+    },
+    {
+      "label": "start backend win",
+      "type": "shell",
+      "command": "iex --werl -S mix phx.server",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_PORT": "4015"
+        }
+      },
+      "problemMatcher": [
+        "$mixCompileError",
+        "$mixCompileWarning"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "start backend deb",
+      "type": "shell",
+      "command": "pg_ctl start && iex -S mix phx.server",
+      "options": {
+        "env": {
+          "MELOG_PHOENIX_PORT": "4015"
+        }
+      },
+      "problemMatcher": [
+          "$mixCompileError",
+          "$mixCompileWarning"
+      ],
+      "group": "build"
+    }
+  ]
+}

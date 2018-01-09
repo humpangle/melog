@@ -1,0 +1,55 @@
+{
+  "version": "2.0.0",
+  "presentation": {
+    "reveal": "always",
+    "panel": "new"
+  },
+  "tasks": [
+    {
+      "label": "build front end test",
+      "type": "shell",
+      "command": "yarn build && node scripts/copy-backend.js",
+      "options": {
+        "env": {
+          "CLIENT_API_URL": "http://localhost:4016/api"
+        }
+      },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "build front end dev",
+      "type": "shell",
+      "command": "yarn build && node scripts/copy-backend.js",
+      "options": {
+        "env": {
+          "REACT_APP_API_URL": "http://localhost:4014/api"
+        }
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "deploy front end prod",
+      "type": "shell",
+      "command": "yarn deploy",
+      "options": {},
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "start front end",
+      "type": "shell",
+      "command": "yarn start",
+      "options": {
+        "env": {
+          "PORT": "3014",
+          "BROWSER": "none",
+          "REACT_APP_API_URL": "http://localhost:4014/api"
+        }
+      },
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}
