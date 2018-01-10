@@ -21,6 +21,8 @@ defmodule Melog.DataCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      import Melog.Factory
+      import Melog.TestUtils
       import Melog.DataCase
     end
   end

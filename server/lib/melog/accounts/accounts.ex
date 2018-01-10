@@ -14,9 +14,9 @@ defmodule Melog.Accounts do
   "email" is required
   """
   @type get_user_by_params :: %{
-    id: nil | String.t | integer,
-    email: nil | String.t
-  }
+          id: nil | String.t() | integer,
+          email: nil | String.t()
+        }
 
   @doc """
   Returns the list of users.
@@ -92,7 +92,7 @@ defmodule Melog.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_user(User.registration_params) :: %User{}
+  @spec create_user(User.registration_params()) :: {:ok, %User{}} | {:error, %Ecto.Changeset{}}
   def create_user(attrs) do
     %User{}
     |> User.registration_changeset(attrs)
@@ -146,24 +146,26 @@ defmodule Melog.Accounts do
     User.changeset(user, %{})
   end
 
-  @doc"""
+  @doc """
   Get a user, confirm if a user's email and password are correct and return the
   user
   """
-  @spec authenticate_user(%{email: String.t, password: String.t}) ::
-    {:ok, %User{}} | :error
-  def authenticate_user( %{email: email} = params) do
+  @spec authenticate_user(%{email: String.t(), password: String.t()}) :: {:ok, %User{}} | :error
+  def authenticate_user(%{email: email} = params) do
     case get_user_by(%{email: email}) do
       nil ->
         dummy_checkpw()
         :error
-      user -> if confirm_password(params, user), do: {:ok, user}, else: :error
+
+      user ->
+        if confirm_password(params, user), do: {:ok, user}, else: :error
     end
   end
 
   defp confirm_password(%{password: password}, user) do
     confirm_password(password, user)
   end
+
   defp confirm_password(password, %User{password_hash: password_hash}) do
     checkpw(password, password_hash)
   end

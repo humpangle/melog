@@ -12,8 +12,8 @@ config :logger, level: :warn
 # Configure your database
 config :melog, Melog.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "melog",
+  password: "",
   database: "melog_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox

@@ -9,3 +9,14 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+import Melog.Factory
+alias Melog.Repo
+alias Melog.Accounts
+alias Melog.Accounts.User
+
+Repo.delete_all(User)
+
+1..5
+|> Enum.each(fn _ ->
+  Accounts.create_user(build(:user))
+end)
