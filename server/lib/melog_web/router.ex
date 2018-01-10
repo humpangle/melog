@@ -1,26 +1,26 @@
 defmodule MelogWeb.Router do
   use MelogWeb, :router
 
-  pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-  end
-
   pipeline :api do
     plug :accepts, ["json"]
+    plug Guardian.Plug.Pipeline,
+      module: MelogWeb.UserSerializer,
+      error_handler: MelogWeb.UserSerializer
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.LoadResource, allow_blank: true
+    plug MelogWeb.Context
   end
 
-  scope "/", MelogWeb do
-    pipe_through :browser # Use the default browser stack
+  scope "/" do
+    pipe_through :api
 
-    get "/", PageController, :index
+    forward "/api", Absinthe.Plug,
+      schema: MelogWeb.Schema,
+      context: %{pubsub: MelogWeb.Endpoint}
+
+    forward "/graphiql", Absinthe.Plug.GraphiQL,
+      schema: MelogWeb.Schema,
+      interface: :simple,
+      context: %{pubsub: MelogWeb.Endpoint}
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", MelogWeb do
-  #   pipe_through :api
-  # end
 end

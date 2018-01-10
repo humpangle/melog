@@ -48,7 +48,10 @@ defmodule Melog.Mixfile do
       {:absinthe_plug, "~> 1.4"},
       {:ex_machina, "~> 2.1"},
       {:guardian, "~> 1.0"},
-      {:comeonin, "~> 4.0"},
+      {:comeonin, "~> 4.0.3"},
+      {:absinthe_ecto, "~> 0.1.3"},
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
+      {:bcrypt_elixir, "~> 1.0.5"},
     ]
   end
 

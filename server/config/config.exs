@@ -22,6 +22,14 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :absinthe,
+  schema: MelogWeb.Schema
+
+config :melog, MelogWeb.UserSerializer,
+  allowed_algos: ["HS512"], # optional
+  issuer: "melog",
+  secret_key: "CmZ3IKcak5GAuUINk4D39adqsouIIOSn1jH+3XX7JC5ZuN7sx0s1nuIZnnQbE3fi"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
