@@ -7,6 +7,13 @@ defmodule MelogWeb.UserQueries do
         username
         insertedAt
         updatedAt
+        experiences {
+          id
+          title
+          intro
+          insertedAt
+          updatedAt
+        }
       }
     }
     """

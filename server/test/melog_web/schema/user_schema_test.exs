@@ -4,6 +4,8 @@ defmodule MelogWeb.UserSchemaTest do
   alias MelogWeb.UserQueries
   alias Melog.Accounts
   alias Melog.Accounts.User
+  alias Melog.ExperienceAPI
+  alias Melog.Experiences.Experience
 
   describe "mutation" do
     test "create user without username" do
@@ -12,18 +14,19 @@ defmodule MelogWeb.UserSchemaTest do
         password: password
       } = build(:user)
 
-      assert {:ok, %{
-               data: %{
-                 "createUser" => %{
-                   "id" => _,
-                   "username" => username,
-                   "email" => ^email,
-                   "jwt" => _,
-                   "insertedAt" => _insertedAt,
-                   "updatedAt" => _
-                 }
-               }
-             }} =
+      assert {:ok,
+              %{
+                data: %{
+                  "createUser" => %{
+                    "id" => _,
+                    "username" => username,
+                    "email" => ^email,
+                    "jwt" => _,
+                    "insertedAt" => _insertedAt,
+                    "updatedAt" => _
+                  }
+                }
+              }} =
                Absinthe.run(
                  UserQueries.mutation(:create_user),
                  Schema,
@@ -45,18 +48,19 @@ defmodule MelogWeb.UserSchemaTest do
         username: username
       } = Map.put(build(:user), :username, "random user")
 
-      assert {:ok, %{
-               data: %{
-                 "createUser" => %{
-                   "id" => _,
-                   "username" => ^username,
-                   "email" => ^email,
-                   "jwt" => _,
-                   "insertedAt" => _,
-                   "updatedAt" => _
-                 }
-               }
-             }} =
+      assert {:ok,
+              %{
+                data: %{
+                  "createUser" => %{
+                    "id" => _,
+                    "username" => ^username,
+                    "email" => ^email,
+                    "jwt" => _,
+                    "insertedAt" => _,
+                    "updatedAt" => _
+                  }
+                }
+              }} =
                Absinthe.run(
                  UserQueries.mutation(:create_user),
                  Schema,
@@ -83,16 +87,17 @@ defmodule MelogWeb.UserSchemaTest do
         password: password
       })
 
-      assert {:ok, %{
-               data: %{
-                 "login" => %{
-                   "id" => _,
-                   "username" => _,
-                   "email" => ^email,
-                   "jwt" => _
-                 }
-               }
-             }} =
+      assert {:ok,
+              %{
+                data: %{
+                  "login" => %{
+                    "id" => _,
+                    "username" => _,
+                    "email" => ^email,
+                    "jwt" => _
+                  }
+                }
+              }} =
                Absinthe.run(
                  UserQueries.mutation(:login),
                  Schema,
@@ -121,16 +126,18 @@ defmodule MelogWeb.UserSchemaTest do
 
       string_id = Integer.to_string(id)
 
-      assert {:ok, %{
-               data: %{
-                 "user" => %{
-                   "id" => ^string_id,
-                   "username" => _,
-                   "insertedAt" => _,
-                   "updatedAt" => _
-                 }
-               }
-             }} =
+      assert {:ok,
+              %{
+                data: %{
+                  "user" => %{
+                    "id" => ^string_id,
+                    "username" => _,
+                    "insertedAt" => _,
+                    "updatedAt" => _,
+                    "experiences" => []
+                  }
+                }
+              }} =
                Absinthe.run(
                  UserQueries.query(:user),
                  Schema,
@@ -156,16 +163,17 @@ defmodule MelogWeb.UserSchemaTest do
 
       string_id = Integer.to_string(id)
 
-      assert {:ok, %{
-               data: %{
-                 "user" => %{
-                   "id" => ^string_id,
-                   "username" => _,
-                   "insertedAt" => _,
-                   "updatedAt" => _
-                 }
-               }
-             }} =
+      assert {:ok,
+              %{
+                data: %{
+                  "user" => %{
+                    "id" => ^string_id,
+                    "username" => _,
+                    "insertedAt" => _,
+                    "updatedAt" => _
+                  }
+                }
+              }} =
                Absinthe.run(
                  UserQueries.query(:user),
                  Schema,
@@ -191,16 +199,17 @@ defmodule MelogWeb.UserSchemaTest do
 
       string_id = Integer.to_string(id)
 
-      assert {:ok, %{
-               data: %{
-                 "user" => %{
-                   "id" => ^string_id,
-                   "username" => _,
-                   "insertedAt" => _,
-                   "updatedAt" => _
-                 }
-               }
-             }} =
+      assert {:ok,
+              %{
+                data: %{
+                  "user" => %{
+                    "id" => ^string_id,
+                    "username" => _,
+                    "insertedAt" => _,
+                    "updatedAt" => _
+                  }
+                }
+              }} =
                Absinthe.run(
                  UserQueries.query(:user),
                  Schema,
@@ -213,7 +222,7 @@ defmodule MelogWeb.UserSchemaTest do
                )
     end
 
-    test "get user errors" do
+    test "get user errors because user is not authenticate" do
       # An unauthenticated user should not be able to access email field
       %{
         email: email
@@ -221,9 +230,10 @@ defmodule MelogWeb.UserSchemaTest do
 
       Accounts.create_user(user)
 
-      assert {:ok, %{
-               errors: _errors
-             }} =
+      assert {:ok,
+              %{
+                errors: _errors
+              }} =
                Absinthe.run(
                  UserQueries.query(:user_error),
                  Schema,
@@ -243,10 +253,11 @@ defmodule MelogWeb.UserSchemaTest do
         password: password
       } = build(:user)
 
-      {:ok, %User{
-        id: id,
-        username: username
-      }} =
+      {:ok,
+       %User{
+         id: id,
+         username: username
+       }} =
         Accounts.create_user(%{
           email: email,
           password: password
@@ -254,11 +265,12 @@ defmodule MelogWeb.UserSchemaTest do
 
       string_id = Integer.to_string(id)
 
-      assert {:ok, %{
-               data: %{
-                 "users" => users
-               }
-             }} =
+      assert {:ok,
+              %{
+                data: %{
+                  "users" => users
+                }
+              }} =
                Absinthe.run(
                  UserQueries.query(:users),
                  Schema
@@ -271,5 +283,71 @@ defmodule MelogWeb.UserSchemaTest do
                "username" => ^username
              } = List.last(users)
     end
+
+    test "get user with experiences" do
+      {:ok,
+       %{
+         data: %{
+           "createUser" => %{
+             "id" => string_id,
+             "email" => email
+           }
+         }
+       }} =
+        Absinthe.run(
+          UserQueries.mutation(:create_user),
+          Schema,
+          variables: %{
+            "user" => map_atom_keys_to_string_keys(build(:user))
+          }
+        )
+
+      {:ok,
+       %Experience{
+         id: exp_id,
+         title: title,
+         intro: intro
+       }} =
+        ExperienceAPI.create_experience(
+          build(:experience, %{
+            user_id: string_id,
+            email: email
+          })
+        )
+
+      string_exp_id = Integer.to_string(exp_id)
+
+      assert {:ok,
+              %{
+                data: %{
+                  "user" => %{
+                    "id" => ^string_id,
+                    "username" => _,
+                    "insertedAt" => _,
+                    "updatedAt" => _,
+                    "experiences" => [
+                      %{
+                        "id" => ^string_exp_id,
+                        "title" => ^title,
+                        "intro" => ^intro
+                      }
+                    ]
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 UserQueries.query(:user),
+                 Schema,
+                 variables: %{
+                   "user" => %{
+                     "email" => email
+                   }
+                 }
+               )
+    end
+  end
+
+  def map_atom_keys_to_string_keys(map) do
+    Map.new(map, fn {k, v} -> {Atom.to_string(k), v} end)
   end
 end

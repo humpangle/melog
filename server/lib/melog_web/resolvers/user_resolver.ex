@@ -5,6 +5,7 @@ defmodule MelogWeb.UserResolver do
   alias Melog.Accounts
   alias Melog.Accounts.User
   alias MelogWeb.ResolversUtil
+  alias Melog.ExperienceAPI
 
   @unauthorized "Unauthorized"
 
@@ -110,6 +111,15 @@ defmodule MelogWeb.UserResolver do
 
   defp email(%{email: email_}) do
     {:ok, email_}
+  end
+
+  def experience(user, _, _) do
+    result =
+      Ecto.assoc(user, :experiences)
+      |> Melog.Repo.all()
+      |> Enum.map(fn exp -> ExperienceAPI.decode_title(exp) end)
+
+    {:ok, result}
   end
 
   @spec is_same_user(

@@ -37,6 +37,10 @@ defmodule MelogWeb.UserSchema do
     field(:inserted_at, non_null(:iso_datetime))
     field(:updated_at, non_null(:iso_datetime))
     field(:jwt, non_null(:string))
+
+    field :experiences, list_of(:experience) do
+      resolve(&UserResolver.experience/3)
+    end
   end
 
   @desc "List of users, may be paginated"

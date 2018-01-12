@@ -15,6 +15,7 @@ defmodule Melog.Factory do
 
   def experience_factory do
     next_sequence = sequence("")
+
     %{
       title: "Experience title#{next_sequence}",
       intro: "Experience intro#{next_sequence}"

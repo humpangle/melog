@@ -21,7 +21,6 @@
 		"elixirLS.projectDir": "server",
 		"[elixir]": {
 			"editor.quickSuggestions": true
-		},
-		"elixirLS.mixEnv": "dev"
+		}
 	}
 }
