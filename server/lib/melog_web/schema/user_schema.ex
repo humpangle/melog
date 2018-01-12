@@ -46,6 +46,7 @@ defmodule MelogWeb.UserSchema do
 
   @desc "Queries allowed on the User object"
   object :user_query do
+    @desc "Get a single user"
     field :user, type: :user do
       arg(:user, non_null(:get_user_input))
 

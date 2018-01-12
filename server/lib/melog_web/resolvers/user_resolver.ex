@@ -6,8 +6,21 @@ defmodule MelogWeb.UserResolver do
   alias Melog.Accounts.User
   alias MelogWeb.ResolversUtil
 
-  @spec user(any, %{user: Accounts.get_user_by_params()}, any) ::
-          {:ok, %User{}} | {:error, message: String.t()}
+  @unauthorized "Unauthorized"
+
+  @doc """
+  Get a single user either by email or id or both.
+  """
+  @spec user(
+          any,
+          %{
+            user: %{
+              id: nil | String.t() | integer,
+              email: nil | String.t()
+            }
+          },
+          any
+        ) :: {:ok, %User{}} | {:error, message: String.t()}
   def user(_root, %{user: get_user_params} = _args, _info) do
     case Accounts.get_user_by(get_user_params) do
       %User{} = user -> {:ok, user}
@@ -15,8 +28,9 @@ defmodule MelogWeb.UserResolver do
     end
   end
 
-  @unauthorized "Unauthorized"
-
+  @doc """
+  Get all existing users.
+  """
   @spec users(any, any, any) :: {:ok, [%User{}]}
   def users(_root, _args, _info) do
     {:ok, Accounts.list_users()}
@@ -31,7 +45,7 @@ defmodule MelogWeb.UserResolver do
         :ok,
         Enum.into(Map.from_struct(user), %{
           jwt: jwt,
-          document_name: :create_user
+          creation_done: true
         })
       }
     else
@@ -46,8 +60,16 @@ defmodule MelogWeb.UserResolver do
     end
   end
 
-  @spec login(any, %{user: %{email: String.t(), password: String.t()}}, any) ::
-          {:ok, %User{}} | {:error, message: String.t()}
+  @spec login(
+          any,
+          %{
+            user: %{
+              email: String.t(),
+              password: String.t()
+            }
+          },
+          any
+        ) :: {:ok, %User{}} | {:error, message: String.t()}
   def login(_root, %{user: login_params}, _info) do
     with {:ok, user} <- Accounts.authenticate_user(login_params),
          {:ok, jwt, _} <- MelogWeb.UserSerializer.encode_and_sign(user, %{}) do
@@ -55,7 +77,7 @@ defmodule MelogWeb.UserResolver do
         :ok,
         Enum.into(Map.from_struct(user), %{
           jwt: jwt,
-          document_name: :login
+          login_done: true
         })
       }
     else
@@ -66,23 +88,19 @@ defmodule MelogWeb.UserResolver do
   @doc """
   Only an authenticated user or newly created user can query her own email.
   """
-  def email(user1, _, %{context: %{current_user: user2}} = context) do
-    %Absinthe.Blueprint.Document.Field{
-      name: document_name
-    } = Enum.at(context.path, 1)
-
-    cond do
-      document_name == "createUser" -> email(user1)
-      is_same_user(user1, user2) -> email(user1)
-      true -> {:error, message: @unauthorized}
+  def email(user1, _, %{context: %{current_user: user2}} = _context) do
+    if is_same_user(user1, user2) do
+      email(user1)
+    else
+      {:error, message: @unauthorized}
     end
   end
 
-  def email(%{document_name: :create_user} = user, _, _) do
+  def email(%{creation_done: true} = user, _, _) do
     email(user)
   end
 
-  def email(%{document_name: :login} = user, _, _) do
+  def email(%{login_done: true} = user, _, _) do
     email(user)
   end
 
@@ -90,12 +108,20 @@ defmodule MelogWeb.UserResolver do
     {:error, message: @unauthorized}
   end
 
-  defp email(%{email: email}) do
-    {:ok, email}
+  defp email(%{email: email_}) do
+    {:ok, email_}
   end
 
-  @spec is_same_user(%{id: String.t(), email: String.t()}, %{id: String.t(), email: String.t()}) ::
-          boolean
+  @spec is_same_user(
+          %{
+            id: String.t(),
+            email: String.t()
+          },
+          %{
+            id: String.t(),
+            email: String.t()
+          }
+        ) :: boolean
   defp is_same_user(%{id: id1, email: email1}, %{id: id2, email: email2}) do
     id1 == id2 && email1 == email2
   end
