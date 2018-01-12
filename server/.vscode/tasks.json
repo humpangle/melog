@@ -218,10 +218,16 @@
         }
       },
       "problemMatcher": [
-          "$mixCompileError",
-          "$mixCompileWarning"
+        "$mixCompileError",
+        "$mixCompileWarning"
       ],
       "group": "build"
+    },
+    {
+      "label": "mix format file",
+      "type": "shell",
+      "command": "mix format  ${file}",
+      "problemMatcher": []
     }
   ]
 }
