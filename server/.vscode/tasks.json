@@ -19,19 +19,6 @@
       }
     },
     {
-      "label": "mix compile deb",
-      "type": "shell",
-      "command": "mix compile",
-      "problemMatcher": [
-        "$mixCompileError",
-        "$mixCompileWarning"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
-    },
-    {
       "label": "mix get compile win",
       "type": "shell",
       "command": "dev.bat && mix do deps.get, compile",

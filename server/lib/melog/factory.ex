@@ -13,6 +13,14 @@ defmodule Melog.Factory do
     Map.put(user, :username, "user#{next_sequence}")
   end
 
+  def experience_factory do
+    next_sequence = sequence("")
+    %{
+      title: "Experience title#{next_sequence}",
+      intro: "Experience intro#{next_sequence}"
+    }
+  end
+
   defp make_user_no_username do
     next_sequence = sequence("")
 

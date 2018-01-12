@@ -51,7 +51,18 @@ defmodule Melog.Accounts do
       nil
 
   """
-  @spec get_user_by(get_user_by_params) :: %User{} | nil
+  @spec get_user_by(
+          %{
+            id: String.t() | integer
+          }
+          | %{
+              email: String.t()
+            }
+          | %{
+              id: String.t() | integer,
+              email: String.t()
+            }
+        ) :: %User{} | nil
   def get_user_by(params) do
     Repo.get_by(User, params)
   end
