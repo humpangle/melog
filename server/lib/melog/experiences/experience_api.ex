@@ -14,25 +14,79 @@ defmodule Melog.ExperienceAPI do
       [%Experience{}, ...]
 
   """
-  def list_experiences do
-    Repo.all(Experience)
+  def list_experiences(params \\ nil) do
+    if params == nil do
+      Repo.all(Experience)
+    else
+      query = from(exp in Experience)
+
+      query =
+        if Map.has_key?(params, :user_id) do
+          user_id = params.user_id
+          from(q in query, where: q.user_id == ^user_id)
+        else
+          query
+        end
+
+      Repo.all(query)
+    end
   end
 
   @doc """
   Gets a single experience.
 
-  Raises `Ecto.NoResultsError` if the Experience does not exist.
+  Returns `nil` if the Experience does not exist.
 
   ## Examples
 
-      iex> get_experience!(123)
+      iex> get_experience_by(id: 123)
       %Experience{}
 
-      iex> get_experience!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_experience_by(title: "non existing title")
+      ** nil
 
   """
-  def get_experience!(id), do: Repo.get!(Experience, id)
+  def get_experience_by(%{title: _title, email: _email} = arg) do
+    params = %{title: encode_title(arg)}
+
+    params =
+      if Map.has_key?(arg, :id) do
+        Map.put(params, :id, arg.id)
+      else
+        params
+      end
+
+    get_experience_by(params)
+  end
+
+  def get_experience_by([title: title, email: email] = arg) do
+    params = %{title: encode_title(%{title: title, email: email})}
+
+    params =
+      if Keyword.has_key?(arg, :id) do
+        Map.put(params, :id, Keyword.get(arg, :id))
+      else
+        params
+      end
+
+    get_experience_by(params)
+  end
+
+  # We can not query experience by user's email. Email only used for title
+  # transform
+  def get_experience_by(%{email: _email} = params) do
+    {_, params_} = Map.pop(params, :email)
+    get_experience_by(params_)
+  end
+
+  def get_experience_by([email: _email] = params) do
+    {_, params_} = Keyword.pop(params, :email)
+    get_experience_by(params_)
+  end
+
+  def get_experience_by(params) do
+    Repo.get_by(Experience, params)
+  end
 
   @doc """
   Creates a experience.
@@ -66,10 +120,20 @@ defmodule Melog.ExperienceAPI do
     |> decode_title()
   end
 
+  @doc """
+  Make a title unique for a user by transforming the title with user's email.
+  """
+  @spec encode_title(%{title: String.t(), email: String.t()} | Map.t()) :: String.t()
   def encode_title(%{title: title, email: email}) do
     "#{email}#{@title_modifier_string}#{title}"
   end
 
+  @doc """
+  Given an experience whose title has been transformed using user's email,
+  return the plain title (without email transform)
+  """
+  @spec decode_title({:ok, %Experience{}} | %Experience{} | String.t() | any) ::
+          {:ok, %Experience{}} | %Experience{} | String.t() | any
   def decode_title({:ok, %Experience{} = exp}) do
     {:ok, decode_title(exp)}
   end
@@ -79,7 +143,11 @@ defmodule Melog.ExperienceAPI do
   end
 
   def decode_title(title) when is_binary(title) do
-    String.split(title, @title_modifier_string) |> List.last()
+    if String.contains?(title, @title_modifier_string) do
+      String.split(title, @title_modifier_string) |> List.last()
+    else
+      title
+    end
   end
 
   def decode_title(arg) do

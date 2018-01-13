@@ -16,4 +16,28 @@ defmodule MelogWeb.ExperienceQueries do
     }
     """
   end
+
+  def query(:experience) do
+    """
+    query Experience($experience: GetExperienceInput!) {
+      experience(experience: $experience) {
+        id
+        title
+        intro
+      }
+    }
+    """
+  end
+
+  def query(:experiences) do
+    """
+    query Experiences($experience: GetExperiencesInput!) {
+      experiences(experience: $experience) {
+        id
+        title
+        intro
+      }
+    }
+    """
+  end
 end

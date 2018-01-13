@@ -13,10 +13,17 @@ import Melog.Factory
 alias Melog.Repo
 alias Melog.Accounts
 alias Melog.Accounts.User
+# alias Melog.Experiences.Experience
+alias Melog.ExperienceAPI
 
 Repo.delete_all(User)
 
 1..5
 |> Enum.each(fn _ ->
-  Accounts.create_user(build(:user))
+  {:ok, user} = build(:user) |> Accounts.create_user()
+
+  Enum.each(1..5, fn _ ->
+    build(:experience, user_id: user.id, email: user.email)
+    |> ExperienceAPI.create_experience()
+  end)
 end)
