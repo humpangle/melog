@@ -4,6 +4,7 @@ defmodule MelogWeb.UserSchema do
   """
 
   use Absinthe.Schema.Notation
+  use Absinthe.Ecto, repo: Melog.Repo
   alias MelogWeb.UserResolver
 
   @desc "Create user input"
@@ -37,10 +38,7 @@ defmodule MelogWeb.UserSchema do
     field(:inserted_at, non_null(:iso_datetime))
     field(:updated_at, non_null(:iso_datetime))
     field(:jwt, non_null(:string))
-
-    field :experiences, list_of(:experience) do
-      resolve(&UserResolver.experience/3)
-    end
+    field(:experiences, list_of(:experience), resolve: assoc(:experiences))
   end
 
   @desc "List of users, may be paginated"
