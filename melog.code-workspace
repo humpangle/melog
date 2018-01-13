@@ -1,9 +1,9 @@
 {
 	"folders": [
-		{
-			"name": "Root",
-			"path": "."
-		},
+		// {
+		// 	"name": "Root",
+		// 	"path": "."
+		// },
 		{
 			"name": "Server",
 			"path": "server"
@@ -15,10 +15,8 @@
 	],
 	"settings": {
 		"typescript.tsdk": "Client/node_modules/typescript/lib",
-		// "elixirLS.projectDir": "server",
 		"editor.formatOnSave": true,
 		"elixirLS.dialyzerEnabled": true,
-		"elixirLS.projectDir": "server",
 		"[elixir]": {
 			"editor.quickSuggestions": true
 		}
