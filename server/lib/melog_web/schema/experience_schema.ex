@@ -35,11 +35,7 @@ defmodule MelogWeb.ExperienceSchema do
   @desc "An experience a user wishes to keep track of"
   object :experience do
     field(:id, non_null(:id))
-
-    field :title, non_null(:string) do
-      resolve(&ExperienceResolver.title/3)
-    end
-
+    field(:title, non_null(:string))
     field(:intro, :string)
     field(:user, :user, resolve: assoc(:user))
     field(:inserted_at, non_null(:iso_datetime))

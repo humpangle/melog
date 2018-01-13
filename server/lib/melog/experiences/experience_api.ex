@@ -1,6 +1,5 @@
 defmodule Melog.ExperienceAPI do
   import Ecto.Query, warn: false
-  import Melog.Experiences.Experience, only: [title_modifier_string: 0]
   alias Melog.Repo
   alias Melog.Experiences.Experience
 
@@ -45,42 +44,21 @@ defmodule Melog.ExperienceAPI do
       ** nil
 
   """
-  def get_experience_by(%{title: _title, email: _email} = arg) do
-    params = %{title: encode_title(arg)}
-
-    params =
-      if Map.has_key?(arg, :id) do
-        Map.put(params, :id, arg.id)
-      else
-        params
-      end
-
-    get_experience_by(params)
+  def get_experience_by(%{title: _title, user_id: _user_id} = arg) do
+    Repo.get_by(Experience, arg)
   end
 
-  def get_experience_by([title: title, email: email] = arg) do
-    params = %{title: encode_title(%{title: title, email: email})}
-
-    params =
-      if Keyword.has_key?(arg, :id) do
-        Map.put(params, :id, Keyword.get(arg, :id))
-      else
-        params
-      end
-
-    get_experience_by(params)
+  def get_experience_by([title: _title, user_id: _user_id] = arg) do
+    Repo.get_by(Experience, arg)
   end
 
-  # We can not query experience by user's email. Email only used for title
-  # transform
-  def get_experience_by(%{email: _email} = params) do
-    {_, params_} = Map.pop(params, :email)
-    get_experience_by(params_)
+  # If we query by title without user_id, we simply return nil
+  def get_experience_by(%{title: _title}) do
+    nil
   end
 
-  def get_experience_by([email: _email] = params) do
-    {_, params_} = Keyword.pop(params, :email)
-    get_experience_by(params_)
+  def get_experience_by(title: _title) do
+    nil
   end
 
   def get_experience_by(params) do
@@ -102,55 +80,12 @@ defmodule Melog.ExperienceAPI do
   @spec create_experience(%{
           title: String.t(),
           intro: String.t(),
-          user_id: String.t(),
-          email: String.t()
+          user_id: String.t()
         }) :: {:ok, %Experience{}} | {:error, %Ecto.Changeset{}}
   def create_experience(attrs) do
-    attrs =
-      Map.put(
-        attrs,
-        :title,
-        encode_title(attrs)
-      )
-
     %Experience{}
     |> Experience.changeset(attrs)
     |> Repo.insert()
-    |> decode_title()
-  end
-
-  @doc """
-  Make a title unique for a user by transforming the title with user's email.
-  """
-  @spec encode_title(%{title: String.t(), email: String.t()} | Map.t()) :: String.t()
-  def encode_title(%{title: title, email: email}) do
-    "#{email}#{title_modifier_string()}#{title}"
-  end
-
-  @doc """
-  Given an experience whose title has been transformed using user's email,
-  return the plain title (without email transform)
-  """
-  @spec decode_title({:ok, %Experience{}} | %Experience{} | String.t() | any) ::
-          {:ok, %Experience{}} | %Experience{} | String.t() | any
-  def decode_title({:ok, %Experience{} = exp}) do
-    {:ok, decode_title(exp)}
-  end
-
-  def decode_title(%Experience{title: encoded_title} = exp) do
-    %{exp | title: decode_title(encoded_title)}
-  end
-
-  def decode_title(title) when is_binary(title) do
-    if String.contains?(title, title_modifier_string()) do
-      String.split(title, title_modifier_string()) |> List.last()
-    else
-      title
-    end
-  end
-
-  def decode_title(arg) do
-    arg
   end
 
   @doc """

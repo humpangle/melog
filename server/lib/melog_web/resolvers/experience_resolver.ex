@@ -59,11 +59,11 @@ defmodule MelogWeb.ExperienceResolver do
     {:error, message: @unauthorized}
   end
 
-  defp update_create_experience_inputs(inputs, %{email: email, id: id}) do
-    Enum.into(inputs, %{email: email, user_id: id})
+  defp update_create_experience_inputs(inputs, %{id: id}) do
+    Enum.into(inputs, %{user_id: id})
   end
 
-  defp create_an_experience(%{email: _, user_id: _} = inputs) do
+  defp create_an_experience(%{user_id: _} = inputs) do
     case Api.create_experience(inputs) do
       {:ok, exp} ->
         {:ok, exp}
@@ -98,11 +98,9 @@ defmodule MelogWeb.ExperienceResolver do
               }
               | %{
                   id: String.t(),
-                  title: String.t(),
-                  email: String.t()
+                  title: String.t()
                 }
               | %{
-                  email: String.t(),
                   title: String.t()
                 }
           },
@@ -129,17 +127,12 @@ defmodule MelogWeb.ExperienceResolver do
 
   defp get_an_experience(user, inputs) do
     # jwt is not a field on experience
-    {_, inputs_} = Map.put(inputs, :email, user.email) |> Map.pop(:jwt)
+    {_, inputs_} = Map.put(inputs, :user_id, user.id) |> Map.pop(:jwt)
 
     case Api.get_experience_by(inputs_) do
       nil -> {:error, message: "Experience not found."}
       exp -> {:ok, exp}
     end
-  end
-
-  def title(exp, _, _) do
-    %Experience{title: title_} = Api.decode_title(exp)
-    {:ok, title_}
   end
 
   @doc """
