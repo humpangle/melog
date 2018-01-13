@@ -11,7 +11,7 @@ defmodule Melog.Experiences.Field do
   schema "fields" do
     field(:name, :string)
     field(:field_type, FieldTypeEnum)
-    field(:boolean, :boolean, default: false)
+    field(:boolean, :boolean)
     field(:number, :integer)
     field(:decimal, :float)
     field(:single_text, :string)

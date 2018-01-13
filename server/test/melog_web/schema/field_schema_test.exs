@@ -5,12 +5,14 @@ defmodule MelogWeb.FieldSchemaTest do
   alias Melog.Experiences.{Field}
   alias Melog.FieldApi, as: Api
 
+  @now Timex.now()
+
   setup do
     user = create_user()
     {:ok, user: user, experience: create_experience(user)}
   end
 
-  describe "mutation" do
+  describe "mutation - create field" do
     test "create field succeeds", %{user: user, experience: experience} do
       %{name: name} = build(:field)
       field_type = Field.data_type(:boolean)
@@ -33,7 +35,7 @@ defmodule MelogWeb.FieldSchemaTest do
                 }
               }} =
                Absinthe.run(
-                 FieldQueries.mutation("create_field"),
+                 FieldQueries.mutation(:create_field),
                  Schema,
                  variables: %{
                    "field" => %{
@@ -55,7 +57,7 @@ defmodule MelogWeb.FieldSchemaTest do
                 errors: _
               }} =
                Absinthe.run(
-                 FieldQueries.mutation("create_field"),
+                 FieldQueries.mutation(:create_field),
                  Schema,
                  variables: %{
                    "field" => %{
@@ -85,7 +87,7 @@ defmodule MelogWeb.FieldSchemaTest do
                 errors: _
               }} =
                Absinthe.run(
-                 FieldQueries.mutation("create_field"),
+                 FieldQueries.mutation(:create_field),
                  Schema,
                  variables: %{
                    "field" => %{
@@ -128,7 +130,7 @@ defmodule MelogWeb.FieldSchemaTest do
                 }
               }} =
                Absinthe.run(
-                 FieldQueries.mutation("create_field"),
+                 FieldQueries.mutation(:create_field),
                  Schema,
                  variables: %{
                    "field" => %{
@@ -145,8 +147,634 @@ defmodule MelogWeb.FieldSchemaTest do
     end
   end
 
+  describe "mutation - store number" do
+    test "store number succeeds", %{user: user, experience: experience} do
+      field_type = Field.data_type(:number)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = 5
+
+      assert {:ok,
+              %{
+                data: %{
+                  "storeNumber" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "number" => ^value
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_number),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "store number fails for non integer values", %{user: user, experience: experience} do
+      field_type = Field.data_type(:number)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = 5.0
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_number),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
+  describe "mutation - store boolean" do
+    test "store boolean succeeds", %{user: user, experience: experience} do
+      field_type = Field.data_type(:boolean)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = true
+
+      assert {:ok,
+              %{
+                data: %{
+                  "storeBoolean" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "boolean" => ^value,
+                    "number" => nil
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_boolean),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "store boolean fails for non boolean values", %{user: user, experience: experience} do
+      field_type = Field.data_type(:boolean)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = "true"
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_boolean),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
+  describe "mutation - store decimal" do
+    test "store decimal succeeds", %{user: user, experience: experience} do
+      field_type = Field.data_type(:decimal)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = 5.0
+
+      assert {:ok,
+              %{
+                data: %{
+                  "storeDecimal" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "decimal" => ^value,
+                    "boolean" => nil,
+                    "number" => nil
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_decimal),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "store decimal fails for non decimal values", %{user: user, experience: experience} do
+      field_type = Field.data_type(:decimal)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = "5.0"
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_decimal),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
+  describe "mutation - store single_text" do
+    test "store single_text succeeds", %{user: user, experience: experience} do
+      field_type = Field.data_type(:single_text)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = "A single text"
+
+      assert {:ok,
+              %{
+                data: %{
+                  "storeSingleText" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "single_text" => ^value,
+                    "decimal" => nil,
+                    "boolean" => nil,
+                    "number" => nil
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_single_text),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "store single_text fails for non string values", %{user: user, experience: experience} do
+      field_type = Field.data_type(:single_text)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = 5.0
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_single_text),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
+  describe "mutation - store multi_text" do
+    test "store multi_text succeeds", %{user: user, experience: experience} do
+      field_type = Field.data_type(:multi_text)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = "A multi
+      line text"
+
+      assert {:ok,
+              %{
+                data: %{
+                  "storeMultiText" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "multi_text" => ^value,
+                    "single_text" => nil,
+                    "decimal" => nil,
+                    "boolean" => nil,
+                    "number" => nil
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_multi_text),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "store multi_text fails for non string values", %{user: user, experience: experience} do
+      field_type = Field.data_type(:multi_text)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = 5.0
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_multi_text),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
+  describe "mutation - store date" do
+    test "store date succeeds", %{user: %{"jwt" => jwt}, experience: %{string_id: experience_id}} do
+      field_type = Field.data_type(:date)
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      {:ok, value} = Timex.format(@now, "{ISOdate}")
+
+      assert {:ok,
+              %{
+                data: %{
+                  "storeDate" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "date" => ^value,
+                    "multi_text" => nil,
+                    "single_text" => nil,
+                    "decimal" => nil,
+                    "boolean" => nil,
+                    "number" => nil
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_date),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "store date fails for invalid date", %{
+      user: %{"jwt" => jwt},
+      experience: %{string_id: experience_id}
+    } do
+      field_type = Field.data_type(:date)
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = "2018-01"
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_date),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
+  describe "mutation - store date_time" do
+    test "store date_time succeeds", %{
+      user: %{"jwt" => jwt},
+      experience: %{string_id: experience_id}
+    } do
+      field_type = Field.data_type(:date_time)
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      {:ok, value} = Timex.format(@now, "{ISO:Extended:Z}")
+
+      assert {:ok,
+              %{
+                data: %{
+                  "storeDateTime" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "dateTime" => ^value,
+                    "date" => nil,
+                    "multi_text" => nil,
+                    "single_text" => nil,
+                    "decimal" => nil,
+                    "boolean" => nil,
+                    "number" => nil
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_date_time),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "store date_time fails for invalid date_time", %{
+      user: %{"jwt" => jwt},
+      experience: %{string_id: experience_id}
+    } do
+      field_type = Field.data_type(:date_time)
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = "2018-01"
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_date_time),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
   defp create_field(attrs) do
-    {:ok, %Field{id: id} = field} = Api.create_field(attrs)
-    Map.from_struct(field) |> Map.put(:string_id, Integer.to_string(id))
+    attrs =
+      if Map.has_key?(attrs, :field_type) do
+        Map.put(attrs, :field_type, String.downcase(attrs.field_type))
+      else
+        attrs
+      end
+
+    {:ok, %Field{id: id} = field} =
+      build(:field, attrs)
+      |> Api.create_field()
+
+    Map.from_struct(field)
+    |> Map.put(:string_id, Integer.to_string(id))
   end
 end
