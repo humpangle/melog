@@ -18,10 +18,19 @@ defmodule Melog.Experiences.Experience do
 
   @doc false
   def changeset(%Experience{} = experience, attrs) do
+    # validate_length min = 5 (email) + 2 + len title_modifier_string
     experience
     |> cast(attrs, [:title, :intro, :user_id])
     |> validate_required([:title, :user_id])
     |> unique_constraint(:title)
-    |> validate_length(:title, min: 2)
+    |> validate_length(:title, min: 16)
+  end
+
+  @doc """
+  `title` field will be made unique by:
+  `user_email + title_modifier_string + title`
+  """
+  def title_modifier_string do
+    "__EMAIL__"
   end
 end

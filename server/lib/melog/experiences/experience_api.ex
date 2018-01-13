@@ -1,9 +1,8 @@
 defmodule Melog.ExperienceAPI do
   import Ecto.Query, warn: false
+  import Melog.Experiences.Experience, only: [title_modifier_string: 0]
   alias Melog.Repo
   alias Melog.Experiences.Experience
-
-  @title_modifier_string "....."
 
   @doc """
   Returns the list of experiences.
@@ -125,7 +124,7 @@ defmodule Melog.ExperienceAPI do
   """
   @spec encode_title(%{title: String.t(), email: String.t()} | Map.t()) :: String.t()
   def encode_title(%{title: title, email: email}) do
-    "#{email}#{@title_modifier_string}#{title}"
+    "#{email}#{title_modifier_string()}#{title}"
   end
 
   @doc """
@@ -143,8 +142,8 @@ defmodule Melog.ExperienceAPI do
   end
 
   def decode_title(title) when is_binary(title) do
-    if String.contains?(title, @title_modifier_string) do
-      String.split(title, @title_modifier_string) |> List.last()
+    if String.contains?(title, title_modifier_string()) do
+      String.split(title, title_modifier_string()) |> List.last()
     else
       title
     end
