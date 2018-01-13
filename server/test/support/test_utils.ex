@@ -56,6 +56,6 @@ defmodule Melog.TestUtils do
       build(:experience, Map.merge(%{email: email, user_id: id}, params))
       |> ExperienceAPI.create_experience()
 
-    exp
+    Map.from_struct(exp) |> Map.put(:string_id, Integer.to_string(exp.id))
   end
 end

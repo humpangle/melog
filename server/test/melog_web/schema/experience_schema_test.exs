@@ -3,7 +3,6 @@ defmodule MelogWeb.ExperienceSchemaTest do
   alias MelogWeb.Schema
   alias MelogWeb.ExperienceQueries
   alias Melog.ExperienceAPI, as: Api
-  alias Melog.Experiences.Experience
 
   defp create_experience_setup(_) do
     user = create_user()
@@ -98,7 +97,7 @@ defmodule MelogWeb.ExperienceSchemaTest do
       %{"email" => email1} = user1 = build(:user) |> create_user()
 
       # We create an experience for new user with the title above
-      %Experience{title: title1} =
+      %{title: title1} =
         create_experience(user1, %{
           title: title,
           intro: intro
@@ -164,19 +163,17 @@ defmodule MelogWeb.ExperienceSchemaTest do
         "jwt" => jwt
       } = user
 
-      %Experience{
-        id: id,
+      %{
+        string_id: id,
         title: title,
         intro: intro
       } = exp
-
-      string_id = Integer.to_string(id)
 
       assert {:ok,
               %{
                 data: %{
                   "experience" => %{
-                    "id" => ^string_id,
+                    "id" => ^id,
                     "title" => ^title,
                     "intro" => ^intro
                   }
@@ -187,7 +184,7 @@ defmodule MelogWeb.ExperienceSchemaTest do
                  Schema,
                  variables: %{
                    "experience" => %{
-                     "id" => string_id,
+                     "id" => id,
                      "jwt" => jwt
                    }
                  }
@@ -199,7 +196,7 @@ defmodule MelogWeb.ExperienceSchemaTest do
         "jwt" => jwt
       } = user
 
-      %Experience{
+      %{
         title: title
       } = exp
 
@@ -228,19 +225,17 @@ defmodule MelogWeb.ExperienceSchemaTest do
         "jwt" => jwt
       } = user
 
-      %Experience{
-        id: id,
+      %{
+        string_id: id,
         title: title,
         intro: intro
       } = exp
-
-      string_id = Integer.to_string(id)
 
       assert {:ok,
               %{
                 data: %{
                   "experience" => %{
-                    "id" => ^string_id,
+                    "id" => ^id,
                     "title" => ^title,
                     "intro" => ^intro
                   }
@@ -251,7 +246,7 @@ defmodule MelogWeb.ExperienceSchemaTest do
                  Schema,
                  variables: %{
                    "experience" => %{
-                     "id" => string_id,
+                     "id" => id,
                      "title" => title,
                      "jwt" => jwt
                    }
@@ -260,11 +255,9 @@ defmodule MelogWeb.ExperienceSchemaTest do
     end
 
     test "get experience fails for unauthenticated user", %{experience: exp} do
-      %Experience{
-        id: id
+      %{
+        string_id: id
       } = exp
-
-      string_id = Integer.to_string(id)
 
       assert {:ok,
               %{
@@ -275,7 +268,7 @@ defmodule MelogWeb.ExperienceSchemaTest do
                  Schema,
                  variables: %{
                    "experience" => %{
-                     "id" => string_id
+                     "id" => id
                    }
                  }
                )
@@ -284,20 +277,18 @@ defmodule MelogWeb.ExperienceSchemaTest do
     test "get experiences succeeds", %{user: user, experience: exp} do
       create_experience(user)
 
-      %Experience{
-        id: id,
+      %{
+        string_id: id,
         title: title,
         intro: intro
       } = exp
-
-      string_id = Integer.to_string(id)
 
       assert {:ok,
               %{
                 data: %{
                   "experiences" => [
                     %{
-                      "id" => ^string_id,
+                      "id" => ^id,
                       "title" => ^title,
                       "intro" => ^intro
                     } = _first_exp,

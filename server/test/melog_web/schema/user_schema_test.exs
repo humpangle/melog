@@ -3,7 +3,6 @@ defmodule MelogWeb.UserSchemaTest do
   alias MelogWeb.Schema
   alias MelogWeb.UserQueries
   alias Melog.Accounts
-  alias Melog.Experiences.Experience
 
   describe "mutation" do
     test "create user without username" do
@@ -235,13 +234,11 @@ defmodule MelogWeb.UserSchemaTest do
     test "get user with experiences" do
       %{"id" => id} = user = create_user()
 
-      %Experience{
-        id: exp_id,
+      %{
+        string_id: exp_id,
         title: title,
         intro: intro
       } = create_experience(user)
-
-      string_exp_id = Integer.to_string(exp_id)
 
       assert {:ok,
               %{
@@ -253,7 +250,7 @@ defmodule MelogWeb.UserSchemaTest do
                     "updatedAt" => _,
                     "experiences" => [
                       %{
-                        "id" => ^string_exp_id,
+                        "id" => ^exp_id,
                         "title" => ^title,
                         "intro" => ^intro
                       }
