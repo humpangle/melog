@@ -44,6 +44,7 @@ defmodule MelogWeb.UserQueries do
     """
   end
 
+  @spec mutation(atom) :: String.t()
   def mutation(:create_user) do
     """
     mutation CreateUser($user: CreateUserInput!) {

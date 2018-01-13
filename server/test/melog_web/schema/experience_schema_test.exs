@@ -1,16 +1,9 @@
 defmodule MelogWeb.ExperienceSchemaTest do
   use Melog.DataCase
   alias MelogWeb.Schema
-  alias MelogWeb.UserQueries
   alias MelogWeb.ExperienceQueries
   alias Melog.ExperienceAPI, as: Api
   alias Melog.Experiences.Experience
-  alias Melog.Accounts
-  alias Melog.Accounts.User
-
-  defp create_user_setup(_) do
-    {:ok, user: create_user()}
-  end
 
   defp create_experience_setup(_) do
     user = create_user()
@@ -18,54 +11,13 @@ defmodule MelogWeb.ExperienceSchemaTest do
     {:ok, user: user, experience: create_experience(user)}
   end
 
-  defp create_user() do
-    %{
-      email: email,
-      password: password
-    } = _user_params = build(:user)
-
-    {:ok,
-     %{
-       data: %{
-         "createUser" => user
-       }
-     }} =
-      Absinthe.run(
-        UserQueries.mutation(:create_user),
-        Schema,
-        variables: %{
-          "user" => %{
-            "email" => email,
-            "password" => password
-          }
-        }
-      )
-
-    user
-  end
-
-  defp create_experience(user) do
-    %{
-      "id" => id,
-      "email" => email
-    } = user
-
-    {:ok, exp} =
-      build(:experience, email: email, user_id: id)
-      |> Api.create_experience()
-
-    exp
-  end
-
   describe "mutation" do
-    setup [:create_user_setup]
-
-    test "create experience succeeds", %{user: user} do
+    test "create experience succeeds" do
       %{
         "id" => user_id,
         "username" => username,
         "jwt" => jwt
-      } = user
+      } = create_user()
 
       %{
         title: title,
@@ -101,26 +53,16 @@ defmodule MelogWeb.ExperienceSchemaTest do
                )
     end
 
-    test "create experience fails because titles not unique for user", %{user: user} do
-      %{
-        "email" => email,
-        "jwt" => jwt,
-        "id" => id
-      } = user
-
+    test "create experience fails because titles not unique for user" do
       %{
         title: title,
         intro: intro
       } = build(:experience)
 
+      user = create_user()
+
       # We create an experience for this user with the title above
-      {:ok, _} =
-        Api.create_experience(%{
-          title: title,
-          intro: intro,
-          email: email,
-          user_id: id
-        })
+      create_experience(user, %{title: title, intro: intro})
 
       # We then try to create another experience, same user and same title
       assert {:ok,
@@ -134,18 +76,18 @@ defmodule MelogWeb.ExperienceSchemaTest do
                    "experience" => %{
                      "title" => title,
                      "intro" => intro,
-                     "jwt" => jwt
+                     "jwt" => user["jwt"]
                    }
                  }
                )
     end
 
-    test "create experience succeeds when two users use same title", %{user: user} do
+    test "create experience succeeds when two users use same title" do
       %{
         "email" => email,
         "jwt" => jwt,
         "id" => id
-      } = user
+      } = create_user()
 
       %{
         title: title,
@@ -153,19 +95,13 @@ defmodule MelogWeb.ExperienceSchemaTest do
       } = build(:experience)
 
       # We create a new user
-      {:ok,
-       %User{
-         email: email1,
-         id: id1
-       }} = Accounts.create_user(build(:user))
+      %{"email" => email1} = user1 = build(:user) |> create_user()
 
       # We create an experience for new user with the title above
-      {:ok, %Experience{title: title1}} =
-        Api.create_experience(%{
+      %Experience{title: title1} =
+        create_experience(user1, %{
           title: title,
-          intro: intro,
-          email: email1,
-          user_id: id1
+          intro: intro
         })
 
       assert title == title1

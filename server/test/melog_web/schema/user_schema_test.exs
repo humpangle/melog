@@ -3,8 +3,6 @@ defmodule MelogWeb.UserSchemaTest do
   alias MelogWeb.Schema
   alias MelogWeb.UserQueries
   alias Melog.Accounts
-  alias Melog.Accounts.User
-  alias Melog.ExperienceAPI
   alias Melog.Experiences.Experience
 
   describe "mutation" do
@@ -113,24 +111,13 @@ defmodule MelogWeb.UserSchemaTest do
 
   describe "query" do
     test "get user by id" do
-      %{
-        email: email,
-        password: password
-      } = build(:user)
-
-      {:ok, %User{id: id}} =
-        Accounts.create_user(%{
-          email: email,
-          password: password
-        })
-
-      string_id = Integer.to_string(id)
+      %{"id" => id} = create_user()
 
       assert {:ok,
               %{
                 data: %{
                   "user" => %{
-                    "id" => ^string_id,
+                    "id" => ^id,
                     "username" => _,
                     "insertedAt" => _,
                     "updatedAt" => _,
@@ -143,31 +130,20 @@ defmodule MelogWeb.UserSchemaTest do
                  Schema,
                  variables: %{
                    "user" => %{
-                     "id" => string_id
+                     "id" => id
                    }
                  }
                )
     end
 
     test "get user by email" do
-      %{
-        email: email,
-        password: password
-      } = build(:user)
-
-      {:ok, %User{id: id}} =
-        Accounts.create_user(%{
-          email: email,
-          password: password
-        })
-
-      string_id = Integer.to_string(id)
+      %{"email" => email, "id" => id} = create_user()
 
       assert {:ok,
               %{
                 data: %{
                   "user" => %{
-                    "id" => ^string_id,
+                    "id" => ^id,
                     "username" => _,
                     "insertedAt" => _,
                     "updatedAt" => _
@@ -186,24 +162,13 @@ defmodule MelogWeb.UserSchemaTest do
     end
 
     test "get user by id and email email" do
-      %{
-        email: email,
-        password: password
-      } = build(:user)
-
-      {:ok, %User{id: id}} =
-        Accounts.create_user(%{
-          email: email,
-          password: password
-        })
-
-      string_id = Integer.to_string(id)
+      %{"email" => email, "id" => id} = create_user()
 
       assert {:ok,
               %{
                 data: %{
                   "user" => %{
-                    "id" => ^string_id,
+                    "id" => ^id,
                     "username" => _,
                     "insertedAt" => _,
                     "updatedAt" => _
@@ -216,7 +181,7 @@ defmodule MelogWeb.UserSchemaTest do
                  variables: %{
                    "user" => %{
                      "email" => email,
-                     "id" => string_id
+                     "id" => id
                    }
                  }
                )
@@ -224,11 +189,7 @@ defmodule MelogWeb.UserSchemaTest do
 
     test "get user errors because user is not authenticate" do
       # An unauthenticated user should not be able to access email field
-      %{
-        email: email
-      } = user = build(:user)
-
-      Accounts.create_user(user)
+      %{"email" => email} = create_user()
 
       assert {:ok,
               %{
@@ -246,24 +207,11 @@ defmodule MelogWeb.UserSchemaTest do
     end
 
     test "get all users succeeds" do
-      Accounts.create_user(build(:user))
+      # first user
+      create_user()
 
-      %{
-        email: email,
-        password: password
-      } = build(:user)
-
-      {:ok,
-       %User{
-         id: id,
-         username: username
-       }} =
-        Accounts.create_user(%{
-          email: email,
-          password: password
-        })
-
-      string_id = Integer.to_string(id)
+      # 2nd user
+      %{"username" => username, "id" => id} = create_user()
 
       assert {:ok,
               %{
@@ -279,41 +227,19 @@ defmodule MelogWeb.UserSchemaTest do
       assert length(users) == 2
 
       assert %{
-               "id" => ^string_id,
+               "id" => ^id,
                "username" => ^username
              } = List.last(users)
     end
 
     test "get user with experiences" do
-      {:ok,
-       %{
-         data: %{
-           "createUser" => %{
-             "id" => string_id,
-             "email" => email
-           }
-         }
-       }} =
-        Absinthe.run(
-          UserQueries.mutation(:create_user),
-          Schema,
-          variables: %{
-            "user" => map_atom_keys_to_string_keys(build(:user))
-          }
-        )
+      %{"id" => id} = user = create_user()
 
-      {:ok,
-       %Experience{
-         id: exp_id,
-         title: title,
-         intro: intro
-       }} =
-        ExperienceAPI.create_experience(
-          build(:experience, %{
-            user_id: string_id,
-            email: email
-          })
-        )
+      %Experience{
+        id: exp_id,
+        title: title,
+        intro: intro
+      } = create_experience(user)
 
       string_exp_id = Integer.to_string(exp_id)
 
@@ -321,7 +247,7 @@ defmodule MelogWeb.UserSchemaTest do
               %{
                 data: %{
                   "user" => %{
-                    "id" => ^string_id,
+                    "id" => ^id,
                     "username" => _,
                     "insertedAt" => _,
                     "updatedAt" => _,
@@ -340,14 +266,10 @@ defmodule MelogWeb.UserSchemaTest do
                  Schema,
                  variables: %{
                    "user" => %{
-                     "email" => email
+                     "id" => id
                    }
                  }
                )
     end
-  end
-
-  def map_atom_keys_to_string_keys(map) do
-    Map.new(map, fn {k, v} -> {Atom.to_string(k), v} end)
   end
 end
