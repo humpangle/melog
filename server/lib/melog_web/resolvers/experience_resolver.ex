@@ -1,11 +1,7 @@
 defmodule MelogWeb.ExperienceResolver do
-  @unauthorized "Unauthorized"
-
   alias Melog.ExperienceAPI, as: Api
   alias MelogWeb.ResolversUtil
-  alias MelogWeb.UserSerializer
   alias Melog.Experiences.Experience
-  alias Melog.Accounts.User
 
   @doc """
   Create an experience for an authenticated user.
@@ -45,7 +41,7 @@ defmodule MelogWeb.ExperienceResolver do
   def create_experience(_root, %{experience: %{jwt: _} = inputs}, _info) do
     {jwt, inputs_} = Map.pop(inputs, :jwt)
 
-    case user_from_token(jwt) do
+    case ResolversUtil.user_from_token(jwt) do
       {:tokenerror, error} ->
         error
 
@@ -56,7 +52,7 @@ defmodule MelogWeb.ExperienceResolver do
   end
 
   def create_experience(_, _, _) do
-    {:error, message: @unauthorized}
+    ResolversUtil.unauthorized()
   end
 
   defp update_create_experience_inputs(inputs, %{id: id}) do
@@ -73,16 +69,6 @@ defmodule MelogWeb.ExperienceResolver do
           :error,
           message: ResolversUtil.changeset_errors_to_string(changeset)
         }
-    end
-  end
-
-  defp user_from_token(token) do
-    error = {:tokenerror, {:error, message: @unauthorized}}
-
-    case UserSerializer.resource_from_token(token) do
-      {:ok, %User{} = user, _claims} -> {:ok, user}
-      {:ok, nil, _claims} -> error
-      _ -> error
     end
   end
 
@@ -115,14 +101,14 @@ defmodule MelogWeb.ExperienceResolver do
   end
 
   def experience(_root, %{experience: %{jwt: jwt} = inputs}, _info) do
-    case user_from_token(jwt) do
+    case ResolversUtil.user_from_token(jwt) do
       {:ok, user} -> get_an_experience(user, inputs)
       {:tokenerror, error} -> error
     end
   end
 
   def experience(_, _, _) do
-    {:error, message: @unauthorized}
+    ResolversUtil.unauthorized()
   end
 
   defp get_an_experience(user, inputs) do
@@ -162,14 +148,14 @@ defmodule MelogWeb.ExperienceResolver do
   end
 
   def experiences(_root, %{experience: %{jwt: jwt} = _inputs}, _info) do
-    case user_from_token(jwt) do
+    case ResolversUtil.user_from_token(jwt) do
       {:ok, user} -> get_experiences(user)
       {:tokenerror, error} -> error
     end
   end
 
   def experiences(_, _, _) do
-    {:error, message: @unauthorized}
+    ResolversUtil.unauthorized()
   end
 
   defp get_experiences(user, _inputs \\ nil) do

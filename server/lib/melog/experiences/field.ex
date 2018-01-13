@@ -1,7 +1,7 @@
 defmodule Melog.Experiences.Field do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Melog.Experiences.Field
+  alias Melog.Experiences.{Field, Experience}
 
   @timestamps_opts [
     type: Timex.Ecto.DateTime,
@@ -9,15 +9,16 @@ defmodule Melog.Experiences.Field do
   ]
 
   schema "fields" do
-    field :boolean, :boolean, default: false
-    field :date, :date
-    field :date_time, :utc_datetime
-    field :decimal, :float
-    field :multi_text, :string
-    field :name, :string
-    field :number, :integer
-    field :single_text, :string
-    field :experience_id, :id
+    field(:name, :string)
+    field(:field_type, FieldTypeEnum)
+    field(:boolean, :boolean, default: false)
+    field(:number, :integer)
+    field(:decimal, :float)
+    field(:single_text, :string)
+    field(:multi_text, :string)
+    field(:date, :date)
+    field(:date_time, :utc_datetime)
+    belongs_to(:experience, Experience)
 
     timestamps()
   end
@@ -25,7 +26,29 @@ defmodule Melog.Experiences.Field do
   @doc false
   def changeset(%Field{} = field, attrs) do
     field
-    |> cast(attrs, [:name, :single_text, :multi_text, :date, :date_time, :number, :boolean, :decimal])
-    |> validate_required([:name, :single_text, :multi_text, :date, :date_time, :number, :boolean, :decimal])
+    |> cast(attrs, [
+      :name,
+      :field_type,
+      :single_text,
+      :multi_text,
+      :date,
+      :date_time,
+      :number,
+      :boolean,
+      :decimal,
+      :experience_id
+    ])
+    |> validate_required([:name, :field_type, :experience_id])
+    |> validate_length(:name, min: 2)
+    |> unique_constraint(:name, name: :fields_name_experience_id_index)
+  end
+
+  def data_type(:raw, dtype) do
+    {:ok, field_type} = FieldTypeEnum.dump(dtype)
+    field_type
+  end
+
+  def data_type(dtype) do
+    data_type(:raw, dtype) |> String.upcase()
   end
 end

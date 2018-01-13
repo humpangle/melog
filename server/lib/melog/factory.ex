@@ -22,6 +22,10 @@ defmodule Melog.Factory do
     }
   end
 
+  def field_factory do
+    %{name: sequence("Field name")}
+  end
+
   defp make_user_no_username do
     next_sequence = sequence("")
 
