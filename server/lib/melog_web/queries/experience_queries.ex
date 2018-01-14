@@ -24,6 +24,10 @@ defmodule MelogWeb.ExperienceQueries do
         id
         title
         intro
+        fields {
+          id
+          name
+        }
       }
     }
     """

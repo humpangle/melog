@@ -3,6 +3,7 @@ defmodule MelogWeb.ExperienceSchemaTest do
   alias MelogWeb.Schema
   alias MelogWeb.ExperienceQueries
   alias Melog.ExperienceAPI, as: Api
+  alias Melog.FieldApi
 
   defp create_experience_setup(_) do
     user = create_user()
@@ -169,13 +170,24 @@ defmodule MelogWeb.ExperienceSchemaTest do
         intro: intro
       } = exp
 
+      # Experience has 3 fields
+      field_type = FieldApi.data_type(:number)
+
+      Enum.each(1..3, fn _ ->
+        create_field(%{
+          field_type: field_type,
+          experience_id: id
+        })
+      end)
+
       assert {:ok,
               %{
                 data: %{
                   "experience" => %{
                     "id" => ^id,
                     "title" => ^title,
-                    "intro" => ^intro
+                    "intro" => ^intro,
+                    "fields" => fields
                   }
                 }
               }} =
@@ -189,6 +201,8 @@ defmodule MelogWeb.ExperienceSchemaTest do
                    }
                  }
                )
+
+      assert length(fields) == 3
     end
 
     test "get experience by title succeeds", %{user: user, experience: exp} do

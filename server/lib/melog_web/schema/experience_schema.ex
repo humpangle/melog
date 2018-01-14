@@ -37,7 +37,13 @@ defmodule MelogWeb.ExperienceSchema do
     field(:id, non_null(:id))
     field(:title, non_null(:string))
     field(:intro, :string)
+
+    @desc "The creator/owner of this experience"
     field(:user, :user, resolve: assoc(:user))
+
+    @desc "Contain different data about the experience"
+    field(:fields, list_of(:field), resolve: assoc(:fields))
+
     field(:inserted_at, non_null(:iso_datetime))
     field(:updated_at, non_null(:iso_datetime))
   end

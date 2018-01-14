@@ -1,7 +1,7 @@
 defmodule Melog.Experiences.Experience do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Melog.Experiences.Experience
+  alias Melog.Experiences.{Experience, Field}
   alias Melog.Accounts.User
 
   @timestamps_opts [
@@ -13,6 +13,7 @@ defmodule Melog.Experiences.Experience do
     field(:intro, :string)
     field(:title, :string)
     belongs_to(:user, User)
+    has_many(:fields, Field)
     timestamps()
   end
 
