@@ -121,4 +121,13 @@ defmodule Melog.FieldApi do
   def change_field(%Field{} = field) do
     Field.changeset(field, %{})
   end
+
+  def data_type(:raw, dtype) do
+    {:ok, field_type} = FieldTypeEnum.dump(dtype)
+    field_type
+  end
+
+  def data_type(dtype) do
+    data_type(:raw, dtype) |> String.upcase()
+  end
 end

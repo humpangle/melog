@@ -7,6 +7,7 @@ defmodule Melog.TestUtils do
   alias MelogWeb.Schema
   alias MelogWeb.UserQueries
   alias Melog.ExperienceAPI
+  alias Melog.FieldApi
 
   # @utc_tz "Etc/UTC"
   # @iso_extended "{ISO:Extended:Z}"
@@ -57,5 +58,21 @@ defmodule Melog.TestUtils do
       |> ExperienceAPI.create_experience()
 
     Map.from_struct(exp) |> Map.put(:string_id, Integer.to_string(exp.id))
+  end
+
+  def create_field(attrs) do
+    attrs =
+      if Map.has_key?(attrs, :field_type) do
+        Map.put(attrs, :field_type, String.downcase(attrs.field_type))
+      else
+        attrs
+      end
+
+    {:ok, field} =
+      build(:field, attrs)
+      |> FieldApi.create_field()
+
+    Map.from_struct(field)
+    |> Map.put(:string_id, Integer.to_string(field.id))
   end
 end

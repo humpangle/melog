@@ -2,7 +2,6 @@ defmodule MelogWeb.FieldSchemaTest do
   use Melog.DataCase
   alias MelogWeb.Schema
   alias MelogWeb.FieldQueries
-  alias Melog.Experiences.{Field}
   alias Melog.FieldApi, as: Api
 
   @now Timex.now()
@@ -15,7 +14,7 @@ defmodule MelogWeb.FieldSchemaTest do
   describe "mutation - create field" do
     test "create field succeeds", %{user: user, experience: experience} do
       %{name: name} = build(:field)
-      field_type = Field.data_type(:boolean)
+      field_type = Api.data_type(:boolean)
 
       %{
         "jwt" => jwt
@@ -50,7 +49,7 @@ defmodule MelogWeb.FieldSchemaTest do
 
     test "create field fails for unauthenticated user", %{experience: experience} do
       %{name: name} = build(:field)
-      field_type = Field.data_type(:boolean)
+      field_type = Api.data_type(:boolean)
 
       assert {:ok,
               %{
@@ -73,8 +72,8 @@ defmodule MelogWeb.FieldSchemaTest do
       %{name: name} = build(:field)
       %{string_id: experience_id} = experience
 
-      field_type1 = Field.data_type(:raw, :boolean)
-      field_type2 = Field.data_type(:number)
+      field_type1 = Api.data_type(:raw, :boolean)
+      field_type2 = Api.data_type(:number)
 
       create_field(%{
         name: name,
@@ -105,7 +104,7 @@ defmodule MelogWeb.FieldSchemaTest do
     } do
       %{name: name} = build(:field)
       %{string_id: experience_id} = experience
-      field_type_raw = Field.data_type(:raw, :boolean)
+      field_type_raw = Api.data_type(:raw, :boolean)
 
       %{name: name1, field_type: field_type1} =
         create_field(%{
@@ -115,7 +114,7 @@ defmodule MelogWeb.FieldSchemaTest do
         })
 
       # same field type as above
-      field_type = Field.data_type(:boolean)
+      field_type = Api.data_type(:boolean)
 
       # a different experience
       %{string_id: experience_id1} = create_experience(user)
@@ -143,13 +142,13 @@ defmodule MelogWeb.FieldSchemaTest do
                )
 
       assert name1 == name2
-      assert Field.data_type(field_type1) == field_type2
+      assert Api.data_type(field_type1) == field_type2
     end
   end
 
   describe "mutation - store number" do
     test "store number succeeds", %{user: user, experience: experience} do
-      field_type = Field.data_type(:number)
+      field_type = Api.data_type(:number)
 
       %{
         "jwt" => jwt
@@ -196,7 +195,7 @@ defmodule MelogWeb.FieldSchemaTest do
     end
 
     test "store number fails for non integer values", %{user: user, experience: experience} do
-      field_type = Field.data_type(:number)
+      field_type = Api.data_type(:number)
 
       %{
         "jwt" => jwt
@@ -235,7 +234,7 @@ defmodule MelogWeb.FieldSchemaTest do
     end
 
     test "does not store value for a different data type", %{user: user, experience: experience} do
-      field_type1 = Field.data_type(:number)
+      field_type1 = Api.data_type(:number)
 
       %{
         "jwt" => jwt
@@ -255,7 +254,7 @@ defmodule MelogWeb.FieldSchemaTest do
         })
 
       # but now we wish to store a decimal type. This should error
-      field_type2 = Field.data_type(:decimal)
+      field_type2 = Api.data_type(:decimal)
 
       value = 5.0
 
@@ -280,7 +279,7 @@ defmodule MelogWeb.FieldSchemaTest do
 
   describe "mutation - store boolean" do
     test "store boolean succeeds", %{user: user, experience: experience} do
-      field_type = Field.data_type(:boolean)
+      field_type = Api.data_type(:boolean)
 
       %{
         "jwt" => jwt
@@ -328,7 +327,7 @@ defmodule MelogWeb.FieldSchemaTest do
     end
 
     test "store boolean fails for non boolean values", %{user: user, experience: experience} do
-      field_type = Field.data_type(:boolean)
+      field_type = Api.data_type(:boolean)
 
       %{
         "jwt" => jwt
@@ -369,7 +368,7 @@ defmodule MelogWeb.FieldSchemaTest do
 
   describe "mutation - store decimal" do
     test "store decimal succeeds", %{user: user, experience: experience} do
-      field_type = Field.data_type(:decimal)
+      field_type = Api.data_type(:decimal)
 
       %{
         "jwt" => jwt
@@ -418,7 +417,7 @@ defmodule MelogWeb.FieldSchemaTest do
     end
 
     test "store decimal fails for non decimal values", %{user: user, experience: experience} do
-      field_type = Field.data_type(:decimal)
+      field_type = Api.data_type(:decimal)
 
       %{
         "jwt" => jwt
@@ -459,7 +458,7 @@ defmodule MelogWeb.FieldSchemaTest do
 
   describe "mutation - store single_text" do
     test "store single_text succeeds", %{user: user, experience: experience} do
-      field_type = Field.data_type(:single_text)
+      field_type = Api.data_type(:single_text)
 
       %{
         "jwt" => jwt
@@ -509,7 +508,7 @@ defmodule MelogWeb.FieldSchemaTest do
     end
 
     test "store single_text fails for non string values", %{user: user, experience: experience} do
-      field_type = Field.data_type(:single_text)
+      field_type = Api.data_type(:single_text)
 
       %{
         "jwt" => jwt
@@ -550,7 +549,7 @@ defmodule MelogWeb.FieldSchemaTest do
 
   describe "mutation - store multi_text" do
     test "store multi_text succeeds", %{user: user, experience: experience} do
-      field_type = Field.data_type(:multi_text)
+      field_type = Api.data_type(:multi_text)
 
       %{
         "jwt" => jwt
@@ -602,7 +601,7 @@ defmodule MelogWeb.FieldSchemaTest do
     end
 
     test "store multi_text fails for non string values", %{user: user, experience: experience} do
-      field_type = Field.data_type(:multi_text)
+      field_type = Api.data_type(:multi_text)
 
       %{
         "jwt" => jwt
@@ -643,7 +642,7 @@ defmodule MelogWeb.FieldSchemaTest do
 
   describe "mutation - store date" do
     test "store date succeeds", %{user: %{"jwt" => jwt}, experience: %{string_id: experience_id}} do
-      field_type = Field.data_type(:date)
+      field_type = Api.data_type(:date)
 
       %{
         name: name,
@@ -690,7 +689,7 @@ defmodule MelogWeb.FieldSchemaTest do
       user: %{"jwt" => jwt},
       experience: %{string_id: experience_id}
     } do
-      field_type = Field.data_type(:date)
+      field_type = Api.data_type(:date)
 
       %{
         string_id: id
@@ -726,7 +725,7 @@ defmodule MelogWeb.FieldSchemaTest do
       user: %{"jwt" => jwt},
       experience: %{string_id: experience_id}
     } do
-      field_type = Field.data_type(:date_time)
+      field_type = Api.data_type(:date_time)
 
       %{
         name: name,
@@ -774,7 +773,7 @@ defmodule MelogWeb.FieldSchemaTest do
       user: %{"jwt" => jwt},
       experience: %{string_id: experience_id}
     } do
-      field_type = Field.data_type(:date_time)
+      field_type = Api.data_type(:date_time)
 
       %{
         string_id: id
@@ -819,7 +818,7 @@ defmodule MelogWeb.FieldSchemaTest do
         title: title
       } = experience
 
-      field_type = Field.data_type(:number)
+      field_type = Api.data_type(:number)
 
       %{
         name: name,
@@ -870,7 +869,7 @@ defmodule MelogWeb.FieldSchemaTest do
       experience: %{string_id: experience_id0},
       user: %{"id" => user_id0, "jwt" => jwt0}
     } do
-      field_type = Field.data_type(:date_time)
+      field_type = Api.data_type(:date_time)
 
       # user 0 has two fields for same experience
       %{
@@ -942,21 +941,5 @@ defmodule MelogWeb.FieldSchemaTest do
                  }
                )
     end
-  end
-
-  defp create_field(attrs) do
-    attrs =
-      if Map.has_key?(attrs, :field_type) do
-        Map.put(attrs, :field_type, String.downcase(attrs.field_type))
-      else
-        attrs
-      end
-
-    {:ok, %Field{id: id} = field} =
-      build(:field, attrs)
-      |> Api.create_field()
-
-    Map.from_struct(field)
-    |> Map.put(:string_id, Integer.to_string(id))
   end
 end

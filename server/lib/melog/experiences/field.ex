@@ -42,13 +42,4 @@ defmodule Melog.Experiences.Field do
     |> validate_length(:name, min: 2)
     |> unique_constraint(:name, name: :fields_name_experience_id_index)
   end
-
-  def data_type(:raw, dtype) do
-    {:ok, field_type} = FieldTypeEnum.dump(dtype)
-    field_type
-  end
-
-  def data_type(dtype) do
-    data_type(:raw, dtype) |> String.upcase()
-  end
 end
