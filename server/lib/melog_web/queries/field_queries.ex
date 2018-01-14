@@ -138,4 +138,52 @@ defmodule MelogWeb.FieldQueries do
     }
     """
   end
+
+  def query(:field) do
+    """
+    query GetField($field: GetFieldInput!) {
+      field(field: $field) {
+        id
+        name
+        fieldType
+        number
+        insertedAt
+        updatedAt
+        experience {
+          id
+          title
+          intro
+          user {
+            id
+            username
+          }
+        }
+      }
+    }
+    """
+  end
+
+  def query(:fields) do
+    """
+    query GetFields($field: GetFieldsInput!) {
+      fields(field: $field) {
+        id
+        name
+        fieldType
+        number
+        insertedAt
+        updatedAt
+        experience {
+          id
+          title
+          intro
+          user {
+            id
+            username
+          }
+        }
+      }
+    }
+    """
+  end
 end

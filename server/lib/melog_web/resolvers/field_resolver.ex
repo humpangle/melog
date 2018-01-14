@@ -1,7 +1,7 @@
 defmodule MelogWeb.FieldResolver do
   alias MelogWeb.ResolversUtil
   alias Melog.FieldApi, as: Api
-  alias Melog.Experiences.Field
+  alias Melog.Experiences.{Field}
 
   def create_field(
         _root,
@@ -65,14 +65,15 @@ defmodule MelogWeb.FieldResolver do
   end
 
   defp store_a_value(%{id: id, field_type: field_type, value: value}) do
-    %Field{name: name} = field = Api.get_field!(id)
+    %Field{
+      name: name,
+      field_type: original_type
+    } = field = Api.get_field!(id)
 
-    case field_type do
-      type_ when is_atom(type_) ->
-        store_a_value(field, Map.put(%{}, type_, value))
-
-      _ ->
-        {:error, message: "Can not update value for field " <> name}
+    if field_type == original_type do
+      store_a_value(field, Map.put(%{}, field_type, value))
+    else
+      {:error, message: "Can not update value for field " <> name}
     end
   end
 
@@ -87,5 +88,62 @@ defmodule MelogWeb.FieldResolver do
           message: ResolversUtil.changeset_errors_to_string(changeset)
         }
     end
+  end
+
+  def field(
+        _root,
+        %{field: inputs},
+        %{context: %{current_user: user}} = _info
+      ) do
+    get_field(user.id, inputs)
+  end
+
+  def field(_root, %{field: %{jwt: _} = inputs}, _info) do
+    {jwt, inputs_} = Map.pop(inputs, :jwt)
+
+    case ResolversUtil.user_from_token(jwt) do
+      {:tokenerror, error} ->
+        error
+
+      {:ok, user} ->
+        get_field(user.id, inputs_)
+    end
+  end
+
+  def field(_, _, _) do
+    ResolversUtil.unauthorized()
+  end
+
+  defp get_field(user_id, %{id: id} = _inputs) do
+    case Api.get_field_for_user(user_id, id) do
+      nil -> ResolversUtil.unauthorized()
+      field -> {:ok, field}
+    end
+  end
+
+  def fields(
+        _root,
+        _inputs,
+        %{context: %{current_user: user}} = _info
+      ) do
+    get_fields(user.id)
+  end
+
+  def fields(_root, %{field: %{jwt: jwt} = _inputs}, _info) do
+    case ResolversUtil.user_from_token(jwt) do
+      {:tokenerror, error} ->
+        error
+
+      {:ok, user} ->
+        get_fields(user.id)
+    end
+  end
+
+  def fields(_, _, _) do
+    ResolversUtil.unauthorized()
+  end
+
+  defp get_fields(user_id) do
+    {:ok, Api.get_fields_for_user(user_id)}
   end
 end

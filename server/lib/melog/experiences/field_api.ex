@@ -36,6 +36,27 @@ defmodule Melog.FieldApi do
   """
   def get_field!(id), do: Repo.get!(Field, id)
 
+  def get_field_for_user(user_id, id) do
+    Repo.one(
+      from(
+        f in Field,
+        where: f.id == ^id,
+        left_join: e in assoc(f, :experience),
+        where: e.user_id == ^user_id
+      )
+    )
+  end
+
+  def get_fields_for_user(user_id) do
+    Repo.all(
+      from(
+        f in Field,
+        left_join: e in assoc(f, :experience),
+        where: e.user_id == ^user_id
+      )
+    )
+  end
+
   @doc """
   Creates a field.
 

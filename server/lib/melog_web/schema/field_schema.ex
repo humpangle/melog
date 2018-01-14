@@ -146,6 +146,21 @@ defmodule MelogWeb.FieldSchema do
     field(:jwt, :string)
   end
 
+  @desc "Inputs for retrieving a field"
+  input_object :get_field_input do
+    @desc "The ID of the field we wish to retrieve."
+    field(:id, non_null(:id))
+
+    @desc "For authentication in non web contexts"
+    field(:jwt, :string)
+  end
+
+  @desc "Inputs for retrieving all fields belonging to a user"
+  input_object :get_fields_input do
+    @desc "For authentication in non web contexts"
+    field(:jwt, :string)
+  end
+
   @desc "Object represeting data about experience user wishes to record."
   object :field do
     field(:id, non_null(:id))
@@ -213,6 +228,21 @@ defmodule MelogWeb.FieldSchema do
       arg(:data, non_null(:store_date_time_input))
 
       resolve(&FieldResolver.store_value/3)
+    end
+  end
+
+  @desc "The queries allowed on the a field object"
+  object :field_query do
+    field :field, type: :field do
+      arg(:field, non_null(:get_field_input))
+
+      resolve(&FieldResolver.field/3)
+    end
+
+    field :fields, type: list_of(:field) do
+      arg(:field, non_null(:get_fields_input))
+
+      resolve(&FieldResolver.fields/3)
     end
   end
 end

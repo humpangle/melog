@@ -10,6 +10,7 @@ defmodule MelogWeb.Schema do
   query do
     import_fields(:user_query)
     import_fields(:experience_query)
+    import_fields(:field_query)
   end
 
   mutation do

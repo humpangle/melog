@@ -233,6 +233,49 @@ defmodule MelogWeb.FieldSchemaTest do
                  }
                )
     end
+
+    test "does not store value for a different data type", %{user: user, experience: experience} do
+      field_type1 = Field.data_type(:number)
+
+      %{
+        "jwt" => jwt
+      } = user
+
+      %{
+        string_id: experience_id
+      } = experience
+
+      %{
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          # field was created with type number
+          field_type: field_type1
+        })
+
+      # but now we wish to store a decimal type. This should error
+      field_type2 = Field.data_type(:decimal)
+
+      value = 5.0
+
+      assert {:ok,
+              %{
+                errors: _
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:store_decimal),
+                 Schema,
+                 variables: %{
+                   "data" => %{
+                     "value" => value,
+                     "fieldType" => field_type2,
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
   end
 
   describe "mutation - store boolean" do
@@ -756,6 +799,145 @@ defmodule MelogWeb.FieldSchemaTest do
                      "fieldType" => field_type,
                      "jwt" => jwt,
                      "id" => id
+                   }
+                 }
+               )
+    end
+  end
+
+  describe "query" do
+    test "get field succeeds", %{user: user, experience: experience} do
+      %{
+        "jwt" => jwt,
+        "username" => username,
+        "id" => user_id
+      } = user
+
+      %{
+        string_id: experience_id,
+        intro: intro,
+        title: title
+      } = experience
+
+      field_type = Field.data_type(:number)
+
+      %{
+        name: name,
+        string_id: id
+      } =
+        create_field(%{
+          experience_id: experience_id,
+          field_type: field_type
+        })
+
+      value = 10
+      field = Api.get_field!(id)
+      {:ok, _} = Api.update_field(field, %{number: value})
+
+      assert {:ok,
+              %{
+                data: %{
+                  "field" => %{
+                    "id" => ^id,
+                    "name" => ^name,
+                    "fieldType" => ^field_type,
+                    "number" => ^value,
+                    "experience" => %{
+                      "id" => ^experience_id,
+                      "title" => ^title,
+                      "intro" => ^intro,
+                      "user" => %{
+                        "id" => ^user_id,
+                        "username" => ^username
+                      }
+                    }
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.query(:field),
+                 Schema,
+                 variables: %{
+                   "field" => %{
+                     "jwt" => jwt,
+                     "id" => id
+                   }
+                 }
+               )
+    end
+
+    test "user can only get field that belongs to her.", %{
+      experience: %{string_id: experience_id0},
+      user: %{"id" => user_id0, "jwt" => jwt0}
+    } do
+      field_type = Field.data_type(:date_time)
+
+      # user 0 has two fields for same experience
+      %{
+        string_id: id01
+      } =
+        create_field(%{
+          experience_id: experience_id0,
+          field_type: field_type
+        })
+
+      %{
+        string_id: id02
+      } =
+        create_field(%{
+          experience_id: experience_id0,
+          field_type: field_type
+        })
+
+      # Another user creates a field
+      %{"id" => user_id1} = user1 = create_user()
+      %{string_id: experience_id1} = create_experience(user1)
+
+      create_field(%{
+        experience_id: experience_id1,
+        field_type: field_type
+      })
+
+      # we check to make sure they are indeed different users with different
+      # experiences
+      refute user_id0 == user_id1
+      refute experience_id0 == experience_id1
+
+      # We have created 3 fields in all: 2 for user0 and 1 for user1
+      assert 3 == Api.list_fields() |> length()
+
+      assert {:ok,
+              %{
+                data: %{
+                  # we got only two from query as expected
+                  "fields" => [
+                    %{
+                      "id" => ^id01,
+                      "experience" => %{
+                        "id" => experience_id0,
+                        "user" => %{
+                          "id" => user_id0
+                        }
+                      }
+                    },
+                    %{
+                      "id" => ^id02,
+                      "experience" => %{
+                        "id" => experience_id0,
+                        "user" => %{
+                          "id" => user_id0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.query(:fields),
+                 Schema,
+                 variables: %{
+                   "field" => %{
+                     "jwt" => jwt0
                    }
                  }
                )
