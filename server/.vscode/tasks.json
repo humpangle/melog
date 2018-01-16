@@ -77,8 +77,8 @@
       "command": "dev.bat && cd ..\\front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration",
       "options": {
         "env": {
-          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
-          "CLIENT_API_URL": "http://localhost:4016/api"
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4015",
+          "CLIENT_API_URL": "http://localhost:4015/api"
         }
       },
       "problemMatcher": [
@@ -93,8 +93,8 @@
       "command": "cd ../front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration",
       "options": {
         "env": {
-          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
-          "CLIENT_API_URL": "http://localhost:4016/api"
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4015",
+          "CLIENT_API_URL": "http://localhost:4015/api"
         }
       },
       "problemMatcher": [
@@ -109,7 +109,7 @@
       "command": "dev.bat && mix test --only integration",
       "options": {
         "env": {
-          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016"
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4015"
         }
       },
       "problemMatcher": [
@@ -124,7 +124,7 @@
       "command": "mix test --only integration",
       "options": {
         "env": {
-          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016"
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4015"
         }
       },
       "problemMatcher": [
@@ -139,8 +139,8 @@
       "command": "cd ..\\front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration ${file}",
       "options": {
         "env": {
-          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
-          "CLIENT_API_URL": "http://localhost:4016/api"
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4015",
+          "CLIENT_API_URL": "http://localhost:4015/api"
         }
       },
       "problemMatcher": [
@@ -155,8 +155,8 @@
       "command": "cd ../front-end-web && yarn build && node scripts/copy-backend.js && cd ${workspaceFolder} && mix test --only integration ${file}",
       "options": {
         "env": {
-          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016",
-          "CLIENT_API_URL": "http://localhost:4016/api"
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4015",
+          "CLIENT_API_URL": "http://localhost:4015/api"
         }
       },
       "problemMatcher": [
@@ -171,7 +171,7 @@
       "command": "mix test --only integration ${file}",
       "options": {
         "env": {
-          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4016"
+          "MELOG_PHOENIX_INTEGRATION_TEST_PORT": "4015"
         }
       },
       "problemMatcher": [
@@ -186,7 +186,7 @@
       "command": "iex --werl -S mix phx.server",
       "options": {
         "env": {
-          "MELOG_PHOENIX_PORT": "4015"
+          "MELOG_PHOENIX_PORT": "4014"
         }
       },
       "problemMatcher": [
@@ -201,7 +201,7 @@
       "command": "pg_ctl start && iex -S mix phx.server",
       "options": {
         "env": {
-          "MELOG_PHOENIX_PORT": "4015"
+          "MELOG_PHOENIX_PORT": "4014"
         }
       },
       "problemMatcher": [

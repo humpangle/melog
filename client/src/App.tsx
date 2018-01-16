@@ -12,9 +12,7 @@ class App extends React.Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Melog</h2>
         </div>
-        <p className="App-intro">
-          A journey of self discovery, one step at a time.
-        </p>
+        <p className="App-intro">Self discovery, one keystroke at a time.</p>
       </div>
     );
   }
