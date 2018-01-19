@@ -50,6 +50,20 @@
       },
       "group": "build",
       "problemMatcher": []
+    },
+    {
+      "label": "start front end js only",
+      "type": "shell",
+      "command": "yarn start-js",
+      "options": {
+        "env": {
+          "PORT": "3014",
+          "BROWSER": "none",
+          "REACT_APP_API_URL": "http://localhost:4014/api"
+        }
+      },
+      "group": "build",
+      "problemMatcher": []
     }
   ]
 }

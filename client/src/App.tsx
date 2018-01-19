@@ -1,18 +1,26 @@
-import * as React from 'react';
-import './App.css';
+import * as React from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import Loadable from "react-loadable";
+import "./App.css";
+import { SIGNUP_URL, LOGIN_URL } from "./constants";
 
-// tslint:disable-next-line:no-var-requires
-const logo = require('./logo.svg');
+const loading = () => <div>Loading..</div>;
+
+const Signin = Loadable({
+  loader: () => import("./routes/signin.route"),
+  loading
+});
 
 class App extends React.Component {
   render() {
     return (
       <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Melog</h2>
-        </div>
-        <p className="App-intro">Self discovery, one keystroke at a time.</p>
+        <BrowserRouter>
+          <Switch>
+            <Route exact={true} path={SIGNUP_URL} component={Signin} />
+            <Route exact={true} path={LOGIN_URL} component={Signin} />
+          </Switch>
+        </BrowserRouter>
       </div>
     );
   }

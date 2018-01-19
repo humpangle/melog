@@ -101,3 +101,7 @@ body {
   background-color: #353A45;
   color: #d9e1e8;
 }
+
+button {
+  cursor: pointer;
+}
