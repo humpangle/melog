@@ -8,6 +8,7 @@ import _some from "lodash-es/some";
 
 import { store } from "./index";
 import { getUser } from "./reducers/index.reducer";
+import { logout } from "./actions/auth.action";
 
 const HTTP_URL = process.env.REACT_APP_API_URL || "";
 
@@ -23,9 +24,9 @@ if (process.env.NODE_ENV !== "production") {
   httpLink = middlewareLoggerLink(httpLink);
 }
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link: httpLink,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache()
 });
 
 export default client;
@@ -37,8 +38,8 @@ function middlewareAuthLink() {
     if (token) {
       operation.setContext({
         headers: {
-          authorization: `Bearer ${token}`,
-        },
+          authorization: `Bearer ${token}`
+        }
       });
     }
 
@@ -54,7 +55,7 @@ const getNow = () => {
 function middlewareLoggerLink(l: ApolloLink) {
   const processOperation = (operation: Operation) => ({
     query: operation.query.loc ? operation.query.loc.source.body : {},
-    variables: operation.variables,
+    variables: operation.variables
   });
 
   const logger = new ApolloLink((operation, forward: NextLink) => {
@@ -105,7 +106,7 @@ function middlewareErrorLink() {
 
       const operationName = `[${errorName} error] from Apollo operation: ${
         operation.operationName
-        }`;
+      }`;
 
       // tslint:disable-next-line:no-console
       console.log(

@@ -2,14 +2,17 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import darkBaseTheme from "material-ui/styles/baseThemes/darkBaseTheme";
+import darkBaseTheme from "material-ui/styles/baseThemes/lightBaseTheme";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 import jss from "jss";
 import preset from "jss-preset-default";
+import { ApolloProvider } from "react-apollo";
+
 import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
 import "./index.css";
 import configureStore from "./store";
+import { client } from "./apollo-setup";
 
 jss.setup(preset());
 
@@ -20,7 +23,9 @@ export const store = configureStore();
 ReactDOM.render(
   <MuiThemeProvider muiTheme={theme}>
     <Provider store={store}>
-      <App />
+      <ApolloProvider client={client}>
+        <App />
+      </ApolloProvider>
     </Provider>
   </MuiThemeProvider>,
   document.getElementById("root") as HTMLElement

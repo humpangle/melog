@@ -64,6 +64,26 @@
       },
       "group": "build",
       "problemMatcher": []
+    },
+    {
+      "label": "Apollo code gen",
+      "type": "shell",
+      "command":
+        "apollo-codegen generate src/graphql/*.ts --schema schema.json --target typescript --output src/graphql/operation-result-types.ts",
+      "problemMatcher": []
+    },
+    {
+      "label": "introspect-schema",
+      "type": "shell",
+      "command":
+        "apollo-codegen introspect-schema http://localhost:4014/api --output schema.json",
+      "problemMatcher": []
+    },
+    {
+      "label": "Edit browser.d.ts",
+      "type": "shell",
+      "command": "cat .browser.d.tsa  > node_modules/react-apollo/browser.d.ts",
+      "problemMatcher": []
     }
   ]
 }

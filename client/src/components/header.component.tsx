@@ -1,7 +1,7 @@
 import * as React from "react";
 
 // tslint:disable-next-line:no-var-requires
-const logo = require("./logo.svg");
+const logo = require("../logo.svg");
 
 const header = () => (
   <div className="App-header">

@@ -10,6 +10,7 @@
     "ordered-imports": false,
     "arrow-parens": false,
     "trailing-comma": false,
-    "object-literal-key-quotes": false
+    "object-literal-key-quotes": false,
+    "jsx-curly-spacing": "always"
   }
 }

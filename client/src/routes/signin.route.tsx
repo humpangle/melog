@@ -3,16 +3,64 @@ import {
   Field,
   reduxForm,
   WrappedFieldProps,
-  InjectedFormProps
+  InjectedFormProps,
+  SubmissionError
 } from "redux-form";
 import TextField from "material-ui/TextField";
 import RaisedButton from "material-ui/RaisedButton";
 import jss from "jss";
 import { orange500, green500 } from "material-ui/styles/colors";
 import { RouteComponentProps, Link } from "react-router-dom";
+import { graphql, ChildProps, compose } from "react-apollo";
+import { connect } from "react-redux";
 
 import RenderSubmit from "../components/render-submit.component";
-import { SIGNUP_URL, LOGIN_URL } from "../constants";
+import {
+  SIGNUP_URL,
+  LOGIN_URL,
+  SIGNIN_FORM_NAME,
+  ROOT_URL
+} from "../constants";
+import LOGIN_MUTATION from "../graphql/login.mutation";
+import SIGNUP_MUTATION from "../graphql/signup.mutation";
+import {
+  LoginMutation,
+  LoginMutationVariables,
+  SignupMutation,
+  SignupMutationVariables
+} from "../graphql/operation-result-types";
+import {
+  LoginMutationProps,
+  LoginMutationFunc,
+  SignupMutationProps,
+  SignupMutationFunc
+} from "../graphql/operation-graphql-types";
+import {
+  setCurrentUser,
+  SetCurrentUserActionFunc
+} from "../actions/auth.action";
+
+const processGraphQlError = (error: string) => {
+  const pattern = /(\[.+:\s.+\])/g;
+  const pattern1 = /\[(.+):\s(.+)\]/g;
+
+  if (!pattern.test(error)) {
+    return { _error: error.replace("GraphQL error: ", "") };
+  }
+
+  const errors = {};
+
+  error.replace(pattern, (_, p) => {
+    const p1 = pattern1.exec(p);
+    if (p1) {
+      const m = p1[2];
+      errors[p1[1]] = m[0].toUpperCase() + m.slice(1);
+    }
+    return "";
+  });
+
+  return errors;
+};
 
 const styles = {
   container: {
@@ -47,13 +95,16 @@ const styles = {
     display: "block"
   },
 
-  buttonStyle: {
-    color: "rgb(175, 168, 168)"
-  },
-
   link: {
     marginTop: "20px",
     display: "block"
+  },
+
+  serverError: {
+    border: `1px solid ${orange500}`,
+    color: orange500,
+    padding: "8px",
+    borderRadius: "2px"
   }
 };
 
@@ -61,7 +112,7 @@ const { classes } = jss.createStyleSheet(styles).attach();
 
 const SwitchRoute = ({ signup }: { signup: boolean }) => (
   <Link to={signup ? LOGIN_URL : SIGNUP_URL} className={`${classes.link}`}>
-    <RaisedButton style={styles.routeSwitch} buttonStyle={styles.buttonStyle}>
+    <RaisedButton style={styles.routeSwitch}>
       {signup ? "Login to your account" : "Create an account"}
     </RaisedButton>
   </Link>
@@ -98,7 +149,7 @@ const validate = (values: FormData) => {
   }
 
   if (password !== passwordConfirm) {
-    errors.passwordConfirm = "Do not match";
+    errors.passwordConfirm = "Passwords don't match";
   }
 
   return errors;
@@ -137,12 +188,65 @@ const renderTextField: React.StatelessComponent<
   );
 };
 
-type SigninProps = RouteComponentProps<{}> & InjectedFormProps<FormData, {}>;
+interface FromReduxState {
+  isSignup: boolean;
+  graphlResponse: "login" | "createUser";
+}
+
+interface FromReduxDispatch {
+  setCurrentUser: SetCurrentUserActionFunc;
+}
+
+type OwnProps = RouteComponentProps<{}> & InjectedFormProps<FormData, {}>;
+
+type InputProps = OwnProps &
+  LoginMutationProps &
+  SignupMutationProps &
+  FromReduxState &
+  FromReduxDispatch;
+
+type SigninProps = ChildProps<InputProps, LoginMutation & SignupMutation>;
 
 const signin = (props: SigninProps) => {
-  const { handleSubmit, pristine, reset, submitting, invalid, match } = props;
+  const {
+    handleSubmit,
+    pristine,
+    reset,
+    submitting,
+    invalid,
+    login,
+    signup,
+    isSignup,
+    graphlResponse,
+    error,
+    history
+  } = props;
 
-  const isSignup = match.path === SIGNUP_URL;
+  const onSubmit = async (values: FormData) => {
+    const { email = "", password = "" } = values;
+
+    try {
+      const { data } = await (isSignup
+        ? signup({ user: { email, password } })
+        : login({ user: { email, password } }));
+
+      const user = data[graphlResponse];
+      props.setCurrentUser(user);
+      history.replace(ROOT_URL);
+    } catch (error) {
+      const message = error.message as string;
+
+      if (message.includes("GraphQL error")) {
+        throw new SubmissionError(processGraphQlError(message));
+      }
+
+      if (message.includes("Network error")) {
+        throw new SubmissionError({
+          _error: "You are offline"
+        });
+      }
+    }
+  };
 
   const renderPasswordConfirm = () => {
     if (isSignup) {
@@ -164,6 +268,12 @@ const signin = (props: SigninProps) => {
   return (
     <div className={classes.container}>
       <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
+        {error ? (
+          <div className={`${classes.serverError}`}>{error}</div>
+        ) : (
+          undefined
+        )}
+
         <div>
           <Field
             name="email"
@@ -200,11 +310,50 @@ const signin = (props: SigninProps) => {
   );
 };
 
-const onSubmit = (values: FormData) => {
-  return values;
-};
-
-export default reduxForm<FormData>({
+const signinForm = reduxForm<FormData>({
   validate,
-  form: "signinForm"
-})(signin);
+  form: SIGNIN_FORM_NAME
+});
+
+const graphqlLogin = graphql<LoginMutation, InputProps>(LOGIN_MUTATION, {
+  props: props => {
+    const mutate = props.mutate as LoginMutationFunc;
+
+    return {
+      login: (params: LoginMutationVariables) =>
+        mutate({
+          variables: params
+        })
+    };
+  }
+});
+
+const graphqlSignup = graphql<SignupMutation, InputProps>(SIGNUP_MUTATION, {
+  props: props => {
+    const mutate = props.mutate as SignupMutationFunc;
+
+    return {
+      signup: (params: SignupMutationVariables) =>
+        mutate({
+          variables: params
+        })
+    };
+  }
+});
+
+const fromRedux = connect<{}, FromReduxDispatch, OwnProps, {}>(
+  (_, ownProps) => {
+    const isSignup = ownProps.match.path === SIGNUP_URL;
+    return {
+      isSignup,
+      graphlResponse: isSignup ? "createUser" : "login"
+    };
+  },
+  {
+    setCurrentUser
+  }
+);
+
+export default compose(signinForm, fromRedux, graphqlLogin, graphqlSignup)(
+  signin
+);

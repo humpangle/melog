@@ -52,7 +52,8 @@ defmodule Melog.Mixfile do
       {:absinthe_ecto, "~> 0.1.3"},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:bcrypt_elixir, "~> 1.0.5"},
-      {:ecto_enum, "~> 1.1.0"}
+      {:ecto_enum, "~> 1.1.0"},
+      {:corsica, "~> 1.1"}
     ]
   end
 

@@ -19,7 +19,7 @@ defmodule MelogWeb.ResolversUtil do
       " | ",
       fn {k, v} ->
         value = Enum.join(v, ",")
-        "#{k}: #{value}"
+        "[#{k}: #{value}]"
       end
     )
   end
