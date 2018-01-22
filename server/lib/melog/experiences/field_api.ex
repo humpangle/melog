@@ -5,7 +5,9 @@ defmodule Melog.FieldApi do
   import Ecto.Query, warn: false
   alias Melog.Repo
 
-  alias Melog.Experiences.Field
+  alias Melog.Experiences.{Field, Experience}
+  alias Melog.ExperienceAPI
+  alias Ecto.Multi
 
   @doc """
   Returns the list of fields.
@@ -76,6 +78,96 @@ defmodule Melog.FieldApi do
   end
 
   @doc """
+  Creates an experience and a collection of fields beloging to that experience
+  simulataneously. Returns the experience struct and associated fields (for
+  success case) or changeset errors (for failure case)
+
+  ## Examples
+
+      iex> create_experience_fields_collection(%{
+        experience: %{intro: "intro", title: "title"},
+        fields: [
+           %{name: "field1", field_type: "boolean"},
+            %{name: "field2", field_type: "number"}
+        ]
+      })
+      {:ok, %{
+        experience: %Experience{},
+        fields: {2, [%Field{}, %Field{}]}
+      }}
+
+      iex> create_experience_fields_collection(%{
+        experience: %{intro: "intro", title: "title"},
+        fields: [
+           %{name: "field1", field_type: "boolean"},
+            %{name: "field2", field_type: "number"}
+        ]
+      })
+      {
+        :error,
+        :fields,
+        {2, nil},
+        %{
+          experience: %Expereince{}
+        }
+      }
+
+      iex> create_experience_fields_collection(%{
+        experience: %{intro: "intro", title: "title"},
+        fields: [
+           %{name: "field1", field_type: "boolean"},
+            %{name: "field2", field_type: "number"}
+        ]
+      })
+      {:error, :experience, %Ecto.Changeset{}, nil}
+
+  """
+  @spec create_experience_fields_collection(%{
+          experience: Map.t(),
+          fields: [Map.t()]
+        }) ::
+          {:ok,
+           %{
+             experience: %Experience{}
+           }
+           | %{required(String.t()) => %Field{}}}
+          | {:error, :experience | String.t(), %Ecto.Changeset{}, any}
+  def create_experience_fields_collection(%{
+        experience: experience,
+        fields: fields_
+      }) do
+    inserts =
+      Multi.new()
+      |> Multi.insert(
+        :experience,
+        ExperienceAPI.change_experience(%Experience{}, experience)
+      )
+      |> Multi.merge(fn %{experience: %Experience{id: id}} ->
+        [field0 | rest_fields] =
+          Enum.map(
+            fields_,
+            &Enum.into(&1, %{experience_id: id})
+          )
+
+        multi0 = make_field_multi({field0, 0})
+
+        rest_fields
+        |> Enum.with_index(1)
+        |> Enum.reduce(multi0, &Multi.append(&2, make_field_multi(&1)))
+      end)
+
+    Repo.transaction(inserts)
+  end
+
+  defp make_field_multi({field, index}) do
+    Multi.new()
+    |> Multi.insert(
+      Integer.to_string(index),
+      change_field(%Field{}, field)
+    )
+  end
+
+  @doc """
   Updates a field.
 
   ## Examples
@@ -118,8 +210,8 @@ defmodule Melog.FieldApi do
       %Ecto.Changeset{source: %Field{}}
 
   """
-  def change_field(%Field{} = field) do
-    Field.changeset(field, %{})
+  def change_field(%Field{} = field, attrs = %{}) do
+    Field.changeset(field, attrs)
   end
 
   def data_type(:raw, dtype) do

@@ -13,6 +13,32 @@ defmodule MelogWeb.FieldQueries do
     """
   end
 
+  def mutation(:create_experience_fields_collection) do
+    """
+    mutation CreateExperienceFieldsCollection(
+      $experienceFields: CreateExperienceFieldsCollectionInput!
+    ){
+      createExperienceFieldsCollection(experienceFields: $experienceFields) {
+        fields {
+          id
+          name
+          fieldType
+          insertedAt
+          updatedAt
+        }
+        experience {
+          id
+          title
+          intro
+          user {
+            id
+          }
+        }
+      }
+    }
+    """
+  end
+
   def mutation(:store_number) do
     """
     mutation StoreNumber($data: StoreNumberInput!){

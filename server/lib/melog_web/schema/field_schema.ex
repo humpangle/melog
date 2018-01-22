@@ -26,7 +26,7 @@ defmodule MelogWeb.FieldSchema do
     value(:date_time, description: "A field value that must be date time")
   end
 
-  @desc "Inputs for creating field"
+  @desc "Inputs for creating a field for an existing experience"
   input_object :create_field_input do
     @desc "The name of the field e.g 'sleep start'"
     field(:name, non_null(:string))
@@ -39,6 +39,27 @@ defmodule MelogWeb.FieldSchema do
 
     @desc "For authentication in non web contexts"
     field(:jwt, :string)
+  end
+
+  @desc "Inputs for a single field in a collection of fields."
+  input_object :single_field do
+    @desc "The name of the field e.g 'sleep start'"
+    field(:name, non_null(:string))
+
+    @desc "The data type of field. E.g. for a field named 'sleep start', date_time"
+    field(:field_type, non_null(:field_data_type))
+  end
+
+  @desc "Inputs for creating a single experience and multiple fields for that experuence"
+  input_object :create_experience_fields_collection_input do
+    @desc "Inputs for the experience to which the fields collection belongs"
+    field(:experience, non_null(:create_experience_input))
+
+    @desc "For authentication in non web contexts"
+    field(:jwt, :string)
+
+    @desc "The list of fields belonging to same experience"
+    field(:fields, :single_field |> list_of() |> non_null())
   end
 
   @desc "Inputs for storing an integer value"
@@ -180,50 +201,77 @@ defmodule MelogWeb.FieldSchema do
     field(:updated_at, non_null(:iso_datetime))
   end
 
+  @desc "Object representing a fields collection i.e experience and a list of fields beloging to that experience"
+  object :fields_collection do
+    @desc "Experience to which all fields in the collection belong"
+    field(:experience, type: :experience)
+
+    @desc "The list of fields belonging to same experience"
+    field(:fields, type: list_of(:field))
+  end
+
   @desc "The mutations allowed on the field object"
   object :field_mutation do
+    @desc "Create a field for an existing experience."
     field :create_field, type: :field do
       arg(:field, non_null(:create_field_input))
 
       resolve(&FieldResolver.create_field/3)
     end
 
+    @desc "Create an experience and collection of fields for the new experience."
+    field :create_experience_fields_collection, type: :fields_collection do
+      arg(
+        :experience_fields,
+        non_null(:create_experience_fields_collection_input)
+      )
+
+      resolve(&FieldResolver.create_experience_fields_collection/3)
+    end
+
+    @desc "Store number data in a field."
     field :store_number, type: :field do
       arg(:data, non_null(:store_number_input))
 
       resolve(&FieldResolver.store_value/3)
     end
 
+    @desc "Store boolean data in a field."
     field :store_boolean, type: :field do
       arg(:data, non_null(:store_boolean_input))
 
       resolve(&FieldResolver.store_value/3)
     end
 
+    @desc "Store floating point number data in a field."
     field :store_decimal, type: :field do
       arg(:data, non_null(:store_decimal_input))
 
       resolve(&FieldResolver.store_value/3)
     end
 
+    @desc "Store single text data in a field."
     field :store_single_text, type: :field do
       arg(:data, non_null(:store_single_text_input))
 
       resolve(&FieldResolver.store_value/3)
     end
 
+    @desc "Store multiple lines text data in a field."
     field :store_multi_text, type: :field do
       arg(:data, non_null(:store_multi_text_input))
 
       resolve(&FieldResolver.store_value/3)
     end
 
+    @desc "Store date data in a field."
     field :store_date, type: :field do
       arg(:data, non_null(:store_date_input))
 
       resolve(&FieldResolver.store_value/3)
     end
 
+    @desc "Store datetime data in a field."
     field :store_date_time, type: :field do
       arg(:data, non_null(:store_date_time_input))
 

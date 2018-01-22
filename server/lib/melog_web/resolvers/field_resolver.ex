@@ -146,4 +146,62 @@ defmodule MelogWeb.FieldResolver do
   defp get_fields(user_id) do
     {:ok, Api.get_fields_for_user(user_id)}
   end
+
+  def create_experience_fields_collection(
+        _root,
+        %{experienceFields: inputs},
+        %{context: %{current_user: user}} = _info
+      ) do
+    create_collection(inputs, user)
+  end
+
+  def create_experience_fields_collection(
+        _root,
+        %{experience_fields: %{jwt: _} = inputs},
+        _info
+      ) do
+    {jwt, inputs_} = Map.pop(inputs, :jwt)
+
+    case ResolversUtil.user_from_token(jwt) do
+      {:tokenerror, error} ->
+        error
+
+      {:ok, user} ->
+        create_collection(inputs_, user)
+    end
+  end
+
+  def create_experience_fields_collection(_, _inputs, _) do
+    ResolversUtil.unauthorized()
+  end
+
+  defp create_collection(
+         %{
+           experience: experience,
+           fields: _fields
+         } = inputs,
+         %{id: user_id}
+       ) do
+    inputs_ =
+      Map.put(
+        inputs,
+        :experience,
+        Map.put(experience, :user_id, user_id)
+      )
+
+    case Api.create_experience_fields_collection(inputs_) do
+      {:ok, result} ->
+        {experience, result_} = Map.pop(result, :experience)
+        fields = Enum.reduce(result_, [], fn {_, v}, acc -> [v | acc] end)
+        {:ok, %{experience: experience, fields: fields}}
+
+      {:error, failed_operation, changeset, _success} ->
+        changeset_string = ResolversUtil.changeset_errors_to_string(changeset)
+
+        {
+          :error,
+          message: "{name: #{failed_operation}, error: #{changeset_string}}"
+        }
+    end
+  end
 end

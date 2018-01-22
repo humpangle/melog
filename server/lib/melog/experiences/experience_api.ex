@@ -131,7 +131,7 @@ defmodule Melog.ExperienceAPI do
       %Ecto.Changeset{source: %Experience{}}
 
   """
-  def change_experience(%Experience{} = experience) do
-    Experience.changeset(experience, %{})
+  def change_experience(%Experience{} = experience, attrs = %{}) do
+    Experience.changeset(experience, attrs)
   end
 end

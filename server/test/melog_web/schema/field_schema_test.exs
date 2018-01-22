@@ -3,15 +3,19 @@ defmodule MelogWeb.FieldSchemaTest do
   alias MelogWeb.Schema
   alias MelogWeb.FieldQueries
   alias Melog.FieldApi, as: Api
+  alias Melog.ExperienceAPI
 
   @now Timex.now()
+  @experience_fields_collection_error_pattern ~r/^\{name:\s(?<failed_operation>[\w]+),\serror:\s\[(?<field_name>.+):\s(?<field_error>.+)\]\}$/
 
-  setup do
+  defp setup_experience(_) do
     user = create_user()
     {:ok, user: user, experience: create_experience(user)}
   end
 
   describe "mutation - create field" do
+    setup [:setup_experience]
+
     test "create field succeeds", %{user: user, experience: experience} do
       %{name: name} = build(:field)
       field_type = Api.data_type(:boolean)
@@ -147,6 +151,8 @@ defmodule MelogWeb.FieldSchemaTest do
   end
 
   describe "mutation - store number" do
+    setup [:setup_experience]
+
     test "store number succeeds", %{user: user, experience: experience} do
       field_type = Api.data_type(:number)
 
@@ -278,6 +284,8 @@ defmodule MelogWeb.FieldSchemaTest do
   end
 
   describe "mutation - store boolean" do
+    setup [:setup_experience]
+
     test "store boolean succeeds", %{user: user, experience: experience} do
       field_type = Api.data_type(:boolean)
 
@@ -367,6 +375,8 @@ defmodule MelogWeb.FieldSchemaTest do
   end
 
   describe "mutation - store decimal" do
+    setup [:setup_experience]
+
     test "store decimal succeeds", %{user: user, experience: experience} do
       field_type = Api.data_type(:decimal)
 
@@ -457,6 +467,8 @@ defmodule MelogWeb.FieldSchemaTest do
   end
 
   describe "mutation - store single_text" do
+    setup [:setup_experience]
+
     test "store single_text succeeds", %{user: user, experience: experience} do
       field_type = Api.data_type(:single_text)
 
@@ -548,6 +560,8 @@ defmodule MelogWeb.FieldSchemaTest do
   end
 
   describe "mutation - store multi_text" do
+    setup [:setup_experience]
+
     test "store multi_text succeeds", %{user: user, experience: experience} do
       field_type = Api.data_type(:multi_text)
 
@@ -641,6 +655,8 @@ defmodule MelogWeb.FieldSchemaTest do
   end
 
   describe "mutation - store date" do
+    setup [:setup_experience]
+
     test "store date succeeds", %{user: %{"jwt" => jwt}, experience: %{string_id: experience_id}} do
       field_type = Api.data_type(:date)
 
@@ -721,6 +737,8 @@ defmodule MelogWeb.FieldSchemaTest do
   end
 
   describe "mutation - store date_time" do
+    setup [:setup_experience]
+
     test "store date_time succeeds", %{
       user: %{"jwt" => jwt},
       experience: %{string_id: experience_id}
@@ -804,7 +822,186 @@ defmodule MelogWeb.FieldSchemaTest do
     end
   end
 
+  describe "mutation - create experience and collections of fields" do
+    test "succeeds" do
+      %{
+        "id" => user_id,
+        "jwt" => jwt
+      } = _user = create_user()
+
+      %{
+        title: title,
+        intro: intro
+      } = _experience = build(:experience)
+
+      fields =
+        [:number, :boolean, :single_text]
+        |> Enum.map(fn type_ ->
+          build(:field, field_type: Api.data_type(type_))
+          |> Map.to_list()
+          |> Enum.reduce(%{}, fn {k, v}, acc ->
+            Map.put(acc, Atom.to_string(k), v)
+          end)
+        end)
+
+      assert {:ok,
+              %{
+                data: %{
+                  "createExperienceFieldsCollection" => %{
+                    "fields" => fields_,
+                    "experience" => %{
+                      "title" => ^title,
+                      "intro" => ^intro,
+                      "user" => %{
+                        "id" => ^user_id
+                      }
+                    }
+                  }
+                }
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:create_experience_fields_collection),
+                 Schema,
+                 variables: %{
+                   "experienceFields" => %{
+                     "experience" => %{
+                       "title" => title,
+                       "intro" => intro
+                     },
+                     "fields" => fields,
+                     "jwt" => jwt
+                   }
+                 }
+               )
+
+      assert length(fields_) == Api.list_fields() |> length()
+    end
+
+    test "fails because field names not unique for experience" do
+      %{
+        "jwt" => jwt
+      } = _user = create_user()
+
+      %{
+        title: title,
+        intro: intro
+      } = _experience = build(:experience)
+
+      # so that field name is unique for test
+      time = System.system_time(:second)
+
+      # note that fields 2 and 3 have same name. This will cause the database
+      # insert to fail
+      fields =
+        [{:number, "name0"}, {:boolean, "name1"}, {:single_text, "name1"}]
+        |> Enum.map(fn {type_, name} ->
+          build(
+            :field,
+            field_type: Api.data_type(type_),
+            name: "#{name}-#{time}"
+          )
+          |> Enum.reduce(%{}, fn {k, v}, acc ->
+            Map.put(acc, Atom.to_string(k), v)
+          end)
+        end)
+
+      assert {:ok,
+              %{
+                errors: [
+                  %{
+                    message: errorMessage,
+                    path: ["createExperienceFieldsCollection"]
+                  }
+                ]
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:create_experience_fields_collection),
+                 Schema,
+                 variables: %{
+                   "experienceFields" => %{
+                     "experience" => %{
+                       "title" => title,
+                       "intro" => intro
+                     },
+                     "fields" => fields,
+                     "jwt" => jwt
+                   }
+                 }
+               )
+
+      # no experience or field should be created since we are running in a
+      # database transaction
+      assert 0 = Api.list_fields() |> length()
+      assert 0 = ExperienceAPI.list_experiences() |> length()
+
+      assert %{
+               # the third field failed because it has same name as second field
+               "failed_operation" => "2",
+               "field_error" => _,
+               # the name field failed because it is not unique
+               "field_name" => "name"
+             } =
+               Regex.named_captures(
+                 @experience_fields_collection_error_pattern,
+                 errorMessage
+               )
+    end
+
+    test "fails because experience title not unique for user" do
+      {:ok, user: %{"jwt" => jwt}, experience: %{title: title}} = setup_experience(true)
+
+      fields = [
+        %{
+          "name" => "#{System.system_time(:second)}",
+          "field_type" => Api.data_type(:number)
+        }
+      ]
+
+      assert {:ok,
+              %{
+                errors: [
+                  %{
+                    message: errorMessage,
+                    path: ["createExperienceFieldsCollection"]
+                  }
+                ]
+              }} =
+               Absinthe.run(
+                 FieldQueries.mutation(:create_experience_fields_collection),
+                 Schema,
+                 variables: %{
+                   "experienceFields" => %{
+                     "experience" => %{
+                       # note that there is already an experience with same
+                       #  title for same user above, so this will fail
+                       "title" => title
+                     },
+                     "fields" => fields,
+                     "jwt" => jwt
+                   }
+                 }
+               )
+
+      # no new experience should be created. Only first experience exists
+      assert 1 = ExperienceAPI.list_experiences() |> length()
+
+      assert %{
+               # experience failed because title not unique for user
+               "failed_operation" => "experience",
+               "field_error" => _,
+               # the title field failed because it is not unique
+               "field_name" => "title"
+             } =
+               Regex.named_captures(
+                 @experience_fields_collection_error_pattern,
+                 errorMessage
+               )
+    end
+  end
+
   describe "query" do
+    setup [:setup_experience]
+
     test "get field succeeds", %{user: user, experience: experience} do
       %{
         "jwt" => jwt,
