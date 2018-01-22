@@ -52,7 +52,7 @@ const AuthRequired = connect<FromReduxState, {}, RouteProps, ReduxState>(
 )(authRequired);
 
 const Home = () => (
-  <div>
+  <div style={{ flex: 1 }}>
     <Header />
   </div>
 );

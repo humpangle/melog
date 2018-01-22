@@ -1,25 +1,39 @@
-import { combineReducers } from "redux";
 import { reducer as form, FormStateMap } from "redux-form";
+import { persistCombineReducers } from "redux-persist";
+import createWebStorage from "redux-persist/es/storage/createWebStorage";
 
-import { SetCurrentUserAction, LogoutAction, AuthState, auth } from "./auth.reducer";
+import {
+  SetCurrentUserAction,
+  LogoutAction,
+  RehydrateAction,
+  AuthState,
+  auth
+} from "./auth.reducer";
 
 export enum ActionTypeKeys {
   SET_CURRENT_USER = "SET_CURRENT_USER",
   LOGOUT = "LOGOUT",
   REHYDRATE = "persist/REHYDRATE",
-  OTHER_ACTION = "__@chatty_any_other_action__",
+  OTHER_ACTION = "__@chatty_any_other_action__"
 }
 
-export type ActionType = SetCurrentUserAction | LogoutAction;
+export type ActionType = SetCurrentUserAction | LogoutAction | RehydrateAction;
 
 export type ReduxState = FormStateMap & {
-  auth: AuthState
+  auth: AuthState;
 };
 
-const reducer = combineReducers<ReduxState>({
-  form,
-  auth
-});
+const reducer = persistCombineReducers<ReduxState>(
+  {
+    key: "@melog",
+    storage: createWebStorage("local"),
+    blacklist: ["form"]
+  },
+  {
+    form,
+    auth
+  }
+);
 
 export default reducer;
 

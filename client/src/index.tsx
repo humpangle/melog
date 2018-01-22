@@ -7,6 +7,7 @@ import getMuiTheme from "material-ui/styles/getMuiTheme";
 import jss from "jss";
 import preset from "jss-preset-default";
 import { ApolloProvider } from "react-apollo";
+import { PersistGate } from "redux-persist/es/integration/react";
 
 import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
@@ -18,14 +19,16 @@ jss.setup(preset());
 
 const theme = getMuiTheme(darkBaseTheme);
 
-export const store = configureStore();
+export const { store, persistor } = configureStore();
 
 ReactDOM.render(
   <MuiThemeProvider muiTheme={theme}>
     <Provider store={store}>
-      <ApolloProvider client={client}>
-        <App />
-      </ApolloProvider>
+      <PersistGate persistor={persistor}>
+        <ApolloProvider client={client}>
+          <App />
+        </ApolloProvider>
+      </PersistGate>
     </Provider>
   </MuiThemeProvider>,
   document.getElementById("root") as HTMLElement

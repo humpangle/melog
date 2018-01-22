@@ -1,5 +1,6 @@
 import { createStore, /*applyMiddleware, */ compose } from "redux";
 import reducer, { ReduxState } from "./reducers/index.reducer";
+import { persistStore } from "redux-persist";
 
 const composeEnhancers =
   // tslint:disable-next-line:no-string-literal
@@ -7,5 +8,6 @@ const composeEnhancers =
 
 export default () => {
   const store = createStore<ReduxState>(reducer, composeEnhancers());
-  return store;
+  const persistor = persistStore(store);
+  return { store, persistor };
 };

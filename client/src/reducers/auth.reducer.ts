@@ -13,6 +13,13 @@ export interface LogoutAction {
   type: ActionTypeKeys.LOGOUT;
 }
 
+export interface RehydrateAction {
+  type: ActionTypeKeys.REHYDRATE;
+  payload?: {
+    auth: AuthState;
+  };
+}
+
 export type AuthState = Immutable.ImmutableObject<UserFragmentFragment>;
 
 const initialState: AuthState = Immutable<UserFragmentFragment>({
@@ -27,6 +34,9 @@ export const auth: Reducer<AuthState> = (
   action: ActionType
 ) => {
   switch (action.type) {
+    case ActionTypeKeys.REHYDRATE:
+      return Immutable((action.payload && action.payload.auth) || state);
+
     case ActionTypeKeys.SET_CURRENT_USER:
       return state.merge(action.user);
 

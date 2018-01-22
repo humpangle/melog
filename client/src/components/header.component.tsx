@@ -7,7 +7,6 @@ const header = () => (
   <div className="App-header">
     <img src={logo} className="App-logo" alt="logo" />
     <h2>Melog</h2>
-    <p className="App-intro">Self discovery, one keystroke at a time.</p>
   </div>
 );
 
