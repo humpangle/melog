@@ -11,3 +11,5 @@ alias MelogWeb.UserQueries
 alias MelogWeb.ExperienceResolver
 alias MelogWeb.ExperienceQueries
 alias Melog.Factory
+alias Melog.FieldApi
+alias Melog.ExperienceAPI

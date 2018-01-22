@@ -288,7 +288,7 @@ defmodule MelogWeb.FieldSchema do
     end
 
     field :fields, type: list_of(:field) do
-      arg(:field, non_null(:get_fields_input))
+      arg(:field, :get_fields_input)
 
       resolve(&FieldResolver.fields/3)
     end

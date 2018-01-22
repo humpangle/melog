@@ -191,7 +191,7 @@ defmodule MelogWeb.FieldQueries do
 
   def query(:fields) do
     """
-    query GetFields($field: GetFieldsInput!) {
+    query GetFields($field: GetFieldsInput) {
       fields(field: $field) {
         id
         name
