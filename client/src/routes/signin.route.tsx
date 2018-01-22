@@ -265,14 +265,13 @@ const signin = (props: SigninProps) => {
     return undefined;
   };
 
+  const renderServerError = () =>
+    error ? <div className={`${classes.serverError}`}>{error}</div> : undefined;
+
   return (
     <div className={classes.container}>
       <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
-        {error ? (
-          <div className={`${classes.serverError}`}>{error}</div>
-        ) : (
-          undefined
-        )}
+        {renderServerError()}
 
         <div>
           <Field

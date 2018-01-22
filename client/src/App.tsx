@@ -6,12 +6,16 @@ import {
   Redirect,
   RouteProps
 } from "react-router-dom";
-import Loadable from "react-loadable";
+import Loadable, { LoadableComponent } from "react-loadable";
 import { connect } from "react-redux";
 
 import "./App.css";
-import { SIGNUP_URL, LOGIN_URL, ROOT_URL } from "./constants";
-import Header from "./components/header.component";
+import {
+  SIGNUP_URL,
+  LOGIN_URL,
+  ROOT_URL,
+  NEW_EXPERIENCE_URL
+} from "./constants";
 import { getUser, ReduxState } from "./reducers/index.reducer";
 
 const loading = () => <div>Loading..</div>;
@@ -21,12 +25,24 @@ const Signin = Loadable({
   loading
 });
 
+const Home = Loadable({
+  loader: () => import("./routes/home.route"),
+  loading
+});
+
+const NewExperience = Loadable({
+  loader: () => import("./routes/new-experience.route"),
+  loading
+});
+
 interface FromReduxState {
   jwt: string;
 }
 
 type Props = FromReduxState & {
-  authComponent: React.StatelessComponent<RouteProps>;
+  authComponent:
+    | (React.ComponentClass<RouteProps> & LoadableComponent)
+    | (React.StatelessComponent<RouteProps> & LoadableComponent);
 };
 
 const authRequired = ({
@@ -51,11 +67,7 @@ const AuthRequired = connect<FromReduxState, {}, RouteProps, ReduxState>(
   })
 )(authRequired);
 
-const Home = () => (
-  <div style={{ flex: 1 }}>
-    <Header />
-  </div>
-);
+const redirectToLogin = () => <Redirect to={LOGIN_URL} />;
 
 class App extends React.Component {
   render() {
@@ -66,7 +78,12 @@ class App extends React.Component {
             <Route exact={true} path={SIGNUP_URL} component={Signin} />
             <Route exact={true} path={LOGIN_URL} component={Signin} />
             <AuthRequired exact={true} path={ROOT_URL} authComponent={Home} />
-            <Route render={() => <Redirect to={LOGIN_URL} />} />
+            <AuthRequired
+              exact={true}
+              path={NEW_EXPERIENCE_URL}
+              authComponent={NewExperience}
+            />
+            <Route render={redirectToLogin} />
           </Switch>
         </BrowserRouter>
       </div>
