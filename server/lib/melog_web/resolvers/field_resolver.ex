@@ -149,7 +149,7 @@ defmodule MelogWeb.FieldResolver do
 
   def create_experience_fields_collection(
         _root,
-        %{experienceFields: inputs},
+        %{experience_fields: inputs},
         %{context: %{current_user: user}} = _info
       ) do
     create_collection(inputs, user)
