@@ -6,9 +6,7 @@ import jss from "jss";
 import { RouteComponentProps, Link } from "react-router-dom";
 
 import Header from "../components/header.component";
-import { NEW_EXPERIENCE_URL } from "../constants";
-
-const positionAbs = "absolute" as "absolute";
+import { NEW_EXPERIENCE_URL, POSITION_ABSOLUTE } from "../constants";
 
 const styles = {
   home: {
@@ -21,13 +19,13 @@ const styles = {
   floatingButton: {
     marginRight: "20px",
     marginBottom: "20px",
-    position: positionAbs,
+    position: POSITION_ABSOLUTE,
     bottom: 0,
     right: 0
   },
 
   floatingActionsUl: {
-    position: positionAbs,
+    position: POSITION_ABSOLUTE,
     bottom: "80px",
     right: 0,
     marginRight: "20px",
@@ -64,7 +62,9 @@ const FloatingActions = ({ show }: { show: boolean }) => {
   return (
     <div className={`${classes.floatingActionsUl} ${show ? "show" : ""}`}>
       <Link to={NEW_EXPERIENCE_URL} className={classes.floatingActionsLink}>
-        <div className={classes.floatingActionsLabel}>New experience</div>
+        <div className={classes.floatingActionsLabel}>
+          New experience definition
+        </div>
         <FloatingActionButton mini={true}>
           <ContentAdd />
         </FloatingActionButton>

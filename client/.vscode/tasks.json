@@ -69,7 +69,7 @@
       "label": "Apollo code gen",
       "type": "shell",
       "command":
-        "apollo-codegen generate src/graphql/*.ts --schema schema.json --target typescript --output src/graphql/operation-result-types.ts",
+        "apollo-codegen generate src/graphql/*.ts --schema schema.json --target typescript --output src/graphql/operation-result.types.ts",
       "problemMatcher": []
     },
     {

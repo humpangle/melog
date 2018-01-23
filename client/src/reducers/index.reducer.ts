@@ -25,7 +25,7 @@ export type ReduxState = FormStateMap & {
 
 const reducer = persistCombineReducers<ReduxState>(
   {
-    key: "@melog",
+    key: "@melog/1516740570612/v1",
     storage: createWebStorage("local"),
     blacklist: ["form"]
   },

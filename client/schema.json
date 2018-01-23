@@ -14,6 +14,59 @@
         },
         {
           "possibleTypes": null,
+          "name": "CreateExperienceFieldsCollectionInput",
+          "kind": "INPUT_OBJECT",
+          "interfaces": null,
+          "inputFields": [
+            {
+              "type": {
+                "ofType": {
+                  "ofType": null,
+                  "name": "CreateExperienceInput",
+                  "kind": "INPUT_OBJECT"
+                },
+                "name": null,
+                "kind": "NON_NULL"
+              },
+              "name": "experience",
+              "description": "Inputs for the experience to which the fields collection belongs",
+              "defaultValue": null
+            },
+            {
+              "type": {
+                "ofType": {
+                  "ofType": {
+                    "ofType": null,
+                    "name": "SingleField",
+                    "kind": "INPUT_OBJECT"
+                  },
+                  "name": null,
+                  "kind": "LIST"
+                },
+                "name": null,
+                "kind": "NON_NULL"
+              },
+              "name": "fields",
+              "description": "The list of fields belonging to same experience",
+              "defaultValue": null
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
+              "name": "jwt",
+              "description": "For authentication in non web contexts",
+              "defaultValue": null
+            }
+          ],
+          "fields": null,
+          "enumValues": null,
+          "description": "Inputs for creating a single experience and multiple fields for that experuence"
+        },
+        {
+          "possibleTypes": null,
           "name": "CreateExperienceInput",
           "kind": "INPUT_OBJECT",
           "interfaces": null,
@@ -118,7 +171,7 @@
           ],
           "fields": null,
           "enumValues": null,
-          "description": "Inputs for creating field"
+          "description": "Inputs for creating a field for an existing experience"
         },
         {
           "possibleTypes": null,
@@ -536,6 +589,45 @@
         },
         {
           "possibleTypes": null,
+          "name": "FieldsCollection",
+          "kind": "OBJECT",
+          "interfaces": [],
+          "inputFields": null,
+          "fields": [
+            {
+              "type": {
+                "ofType": null,
+                "name": "Experience",
+                "kind": "OBJECT"
+              },
+              "name": "experience",
+              "isDeprecated": false,
+              "description": "Experience to which all fields in the collection belong",
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": {
+                  "ofType": null,
+                  "name": "Field",
+                  "kind": "OBJECT"
+                },
+                "name": null,
+                "kind": "LIST"
+              },
+              "name": "fields",
+              "isDeprecated": false,
+              "description": "The list of fields belonging to same experience",
+              "deprecationReason": null,
+              "args": []
+            }
+          ],
+          "enumValues": null,
+          "description": "Object representing a fields collection i.e experience and a list of fields beloging to that experience"
+        },
+        {
+          "possibleTypes": null,
           "name": "Float",
           "kind": "SCALAR",
           "interfaces": null,
@@ -799,12 +891,39 @@
             {
               "type": {
                 "ofType": null,
+                "name": "FieldsCollection",
+                "kind": "OBJECT"
+              },
+              "name": "createExperienceFieldsCollection",
+              "isDeprecated": false,
+              "description": "Create an experience and collection of fields for the new experience.",
+              "deprecationReason": null,
+              "args": [
+                {
+                  "type": {
+                    "ofType": {
+                      "ofType": null,
+                      "name": "CreateExperienceFieldsCollectionInput",
+                      "kind": "INPUT_OBJECT"
+                    },
+                    "name": null,
+                    "kind": "NON_NULL"
+                  },
+                  "name": "experienceFields",
+                  "description": null,
+                  "defaultValue": null
+                }
+              ]
+            },
+            {
+              "type": {
+                "ofType": null,
                 "name": "Field",
                 "kind": "OBJECT"
               },
               "name": "createField",
               "isDeprecated": false,
-              "description": null,
+              "description": "Create a field for an existing experience.",
               "deprecationReason": null,
               "args": [
                 {
@@ -885,7 +1004,7 @@
               },
               "name": "storeBoolean",
               "isDeprecated": false,
-              "description": null,
+              "description": "Store boolean data in a field.",
               "deprecationReason": null,
               "args": [
                 {
@@ -912,7 +1031,7 @@
               },
               "name": "storeDate",
               "isDeprecated": false,
-              "description": null,
+              "description": "Store date data in a field.",
               "deprecationReason": null,
               "args": [
                 {
@@ -939,7 +1058,7 @@
               },
               "name": "storeDateTime",
               "isDeprecated": false,
-              "description": null,
+              "description": "Store datetime data in a field.",
               "deprecationReason": null,
               "args": [
                 {
@@ -966,7 +1085,7 @@
               },
               "name": "storeDecimal",
               "isDeprecated": false,
-              "description": null,
+              "description": "Store floating point number data in a field.",
               "deprecationReason": null,
               "args": [
                 {
@@ -993,7 +1112,7 @@
               },
               "name": "storeMultiText",
               "isDeprecated": false,
-              "description": null,
+              "description": "Store multiple lines text data in a field.",
               "deprecationReason": null,
               "args": [
                 {
@@ -1020,7 +1139,7 @@
               },
               "name": "storeNumber",
               "isDeprecated": false,
-              "description": null,
+              "description": "Store number data in a field.",
               "deprecationReason": null,
               "args": [
                 {
@@ -1047,7 +1166,7 @@
               },
               "name": "storeSingleText",
               "isDeprecated": false,
-              "description": null,
+              "description": "Store single text data in a field.",
               "deprecationReason": null,
               "args": [
                 {
@@ -1175,13 +1294,9 @@
               "args": [
                 {
                   "type": {
-                    "ofType": {
-                      "ofType": null,
-                      "name": "GetFieldsInput",
-                      "kind": "INPUT_OBJECT"
-                    },
-                    "name": null,
-                    "kind": "NON_NULL"
+                    "ofType": null,
+                    "name": "GetFieldsInput",
+                    "kind": "INPUT_OBJECT"
                   },
                   "name": "field",
                   "description": null,
@@ -1235,6 +1350,45 @@
           ],
           "enumValues": null,
           "description": null
+        },
+        {
+          "possibleTypes": null,
+          "name": "SingleField",
+          "kind": "INPUT_OBJECT",
+          "interfaces": null,
+          "inputFields": [
+            {
+              "type": {
+                "ofType": {
+                  "ofType": null,
+                  "name": "FieldDataType",
+                  "kind": "ENUM"
+                },
+                "name": null,
+                "kind": "NON_NULL"
+              },
+              "name": "fieldType",
+              "description": "The data type of field. E.g. for a field named 'sleep start', date_time",
+              "defaultValue": null
+            },
+            {
+              "type": {
+                "ofType": {
+                  "ofType": null,
+                  "name": "String",
+                  "kind": "SCALAR"
+                },
+                "name": null,
+                "kind": "NON_NULL"
+              },
+              "name": "name",
+              "description": "The name of the field e.g 'sleep start'",
+              "defaultValue": null
+            }
+          ],
+          "fields": null,
+          "enumValues": null,
+          "description": "Inputs for a single field in a collection of fields."
         },
         {
           "possibleTypes": null,
@@ -1808,59 +1962,6 @@
         },
         {
           "possibleTypes": null,
-          "name": "__DirectiveLocation",
-          "kind": "ENUM",
-          "interfaces": null,
-          "inputFields": null,
-          "fields": null,
-          "enumValues": [
-            {
-              "name": "FIELD",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null
-            },
-            {
-              "name": "FRAGMENT_DEFINITION",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null
-            },
-            {
-              "name": "FRAGMENT_SPREAD",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null
-            },
-            {
-              "name": "INLINE_FRAGMENT",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null
-            },
-            {
-              "name": "MUTATION",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null
-            },
-            {
-              "name": "QUERY",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null
-            },
-            {
-              "name": "SUBSCRIPTION",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null
-            }
-          ],
-          "description": null
-        },
-        {
-          "possibleTypes": null,
           "name": "__Schema",
           "kind": "OBJECT",
           "interfaces": [],
@@ -1940,7 +2041,7 @@
         },
         {
           "possibleTypes": null,
-          "name": "__Field",
+          "name": "__Directive",
           "kind": "OBJECT",
           "interfaces": [],
           "inputFields": null,
@@ -1967,7 +2068,23 @@
                 "name": "String",
                 "kind": "SCALAR"
               },
-              "name": "deprecationReason",
+              "name": "description",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": {
+                  "ofType": null,
+                  "name": "__DirectiveLocation",
+                  "kind": "ENUM"
+                },
+                "name": null,
+                "kind": "LIST"
+              },
+              "name": "locations",
               "isDeprecated": false,
               "description": null,
               "deprecationReason": null,
@@ -1979,7 +2096,7 @@
                 "name": "String",
                 "kind": "SCALAR"
               },
-              "name": "description",
+              "name": "name",
               "isDeprecated": false,
               "description": null,
               "deprecationReason": null,
@@ -1991,128 +2108,10 @@
                 "name": "Boolean",
                 "kind": "SCALAR"
               },
-              "name": "isDeprecated",
-              "isDeprecated": false,
+              "name": "onField",
+              "isDeprecated": true,
               "description": null,
-              "deprecationReason": null,
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "String",
-                "kind": "SCALAR"
-              },
-              "name": "name",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "__Type",
-                "kind": "OBJECT"
-              },
-              "name": "type",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
-              "args": []
-            }
-          ],
-          "enumValues": null,
-          "description": null
-        },
-        {
-          "possibleTypes": null,
-          "name": "__InputValue",
-          "kind": "OBJECT",
-          "interfaces": [],
-          "inputFields": null,
-          "fields": [
-            {
-              "type": {
-                "ofType": null,
-                "name": "String",
-                "kind": "SCALAR"
-              },
-              "name": "defaultValue",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "String",
-                "kind": "SCALAR"
-              },
-              "name": "description",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "String",
-                "kind": "SCALAR"
-              },
-              "name": "name",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "__Type",
-                "kind": "OBJECT"
-              },
-              "name": "type",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
-              "args": []
-            }
-          ],
-          "enumValues": null,
-          "description": null
-        },
-        {
-          "possibleTypes": null,
-          "name": "__EnumValue",
-          "kind": "OBJECT",
-          "interfaces": [],
-          "inputFields": null,
-          "fields": [
-            {
-              "type": {
-                "ofType": null,
-                "name": "String",
-                "kind": "SCALAR"
-              },
-              "name": "deprecationReason",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "String",
-                "kind": "SCALAR"
-              },
-              "name": "description",
-              "isDeprecated": false,
-              "description": null,
-              "deprecationReason": null,
+              "deprecationReason": "Check `locations` field for enum value FIELD",
               "args": []
             },
             {
@@ -2121,27 +2120,27 @@
                 "name": "Boolean",
                 "kind": "SCALAR"
               },
-              "name": "isDeprecated",
-              "isDeprecated": false,
+              "name": "onFragment",
+              "isDeprecated": true,
               "description": null,
-              "deprecationReason": null,
+              "deprecationReason": "Check `locations` field for enum value FRAGMENT_SPREAD",
               "args": []
             },
             {
               "type": {
                 "ofType": null,
-                "name": "String",
+                "name": "Boolean",
                 "kind": "SCALAR"
               },
-              "name": "name",
-              "isDeprecated": false,
+              "name": "onOperation",
+              "isDeprecated": true,
               "description": null,
-              "deprecationReason": null,
+              "deprecationReason": "Check `locations` field for enum value OPERATION",
               "args": []
             }
           ],
           "enumValues": null,
-          "description": null
+          "description": "Represents a directive"
         },
         {
           "possibleTypes": null,
@@ -2306,7 +2305,178 @@
         },
         {
           "possibleTypes": null,
-          "name": "__Directive",
+          "name": "__DirectiveLocation",
+          "kind": "ENUM",
+          "interfaces": null,
+          "inputFields": null,
+          "fields": null,
+          "enumValues": [
+            {
+              "name": "FIELD",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null
+            },
+            {
+              "name": "FRAGMENT_DEFINITION",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null
+            },
+            {
+              "name": "FRAGMENT_SPREAD",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null
+            },
+            {
+              "name": "INLINE_FRAGMENT",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null
+            },
+            {
+              "name": "MUTATION",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null
+            },
+            {
+              "name": "QUERY",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null
+            },
+            {
+              "name": "SUBSCRIPTION",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null
+            }
+          ],
+          "description": null
+        },
+        {
+          "possibleTypes": null,
+          "name": "__EnumValue",
+          "kind": "OBJECT",
+          "interfaces": [],
+          "inputFields": null,
+          "fields": [
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
+              "name": "deprecationReason",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
+              "name": "description",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "Boolean",
+                "kind": "SCALAR"
+              },
+              "name": "isDeprecated",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
+              "name": "name",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            }
+          ],
+          "enumValues": null,
+          "description": null
+        },
+        {
+          "possibleTypes": null,
+          "name": "__InputValue",
+          "kind": "OBJECT",
+          "interfaces": [],
+          "inputFields": null,
+          "fields": [
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
+              "name": "defaultValue",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
+              "name": "description",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
+              "name": "name",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "__Type",
+                "kind": "OBJECT"
+              },
+              "name": "type",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            }
+          ],
+          "enumValues": null,
+          "description": null
+        },
+        {
+          "possibleTypes": null,
+          "name": "__Field",
           "kind": "OBJECT",
           "interfaces": [],
           "inputFields": null,
@@ -2333,6 +2503,18 @@
                 "name": "String",
                 "kind": "SCALAR"
               },
+              "name": "deprecationReason",
+              "isDeprecated": false,
+              "description": null,
+              "deprecationReason": null,
+              "args": []
+            },
+            {
+              "type": {
+                "ofType": null,
+                "name": "String",
+                "kind": "SCALAR"
+              },
               "name": "description",
               "isDeprecated": false,
               "description": null,
@@ -2341,15 +2523,11 @@
             },
             {
               "type": {
-                "ofType": {
-                  "ofType": null,
-                  "name": "__DirectiveLocation",
-                  "kind": "ENUM"
-                },
-                "name": null,
-                "kind": "LIST"
+                "ofType": null,
+                "name": "Boolean",
+                "kind": "SCALAR"
               },
-              "name": "locations",
+              "name": "isDeprecated",
               "isDeprecated": false,
               "description": null,
               "deprecationReason": null,
@@ -2370,42 +2548,18 @@
             {
               "type": {
                 "ofType": null,
-                "name": "Boolean",
-                "kind": "SCALAR"
+                "name": "__Type",
+                "kind": "OBJECT"
               },
-              "name": "onField",
-              "isDeprecated": true,
+              "name": "type",
+              "isDeprecated": false,
               "description": null,
-              "deprecationReason": "Check `locations` field for enum value FIELD",
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "Boolean",
-                "kind": "SCALAR"
-              },
-              "name": "onFragment",
-              "isDeprecated": true,
-              "description": null,
-              "deprecationReason": "Check `locations` field for enum value FRAGMENT_SPREAD",
-              "args": []
-            },
-            {
-              "type": {
-                "ofType": null,
-                "name": "Boolean",
-                "kind": "SCALAR"
-              },
-              "name": "onOperation",
-              "isDeprecated": true,
-              "description": null,
-              "deprecationReason": "Check `locations` field for enum value OPERATION",
+              "deprecationReason": null,
               "args": []
             }
           ],
           "enumValues": null,
-          "description": "Represents a directive"
+          "description": null
         }
       ],
       "subscriptionType": null,

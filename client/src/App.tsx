@@ -31,7 +31,7 @@ const Home = Loadable({
 });
 
 const NewExperience = Loadable({
-  loader: () => import("./routes/new-experience.route"),
+  loader: () => import("./routes/new-experience-definition.route"),
   loading
 });
 
@@ -41,8 +41,8 @@ interface FromReduxState {
 
 type Props = FromReduxState & {
   authComponent:
-    | (React.ComponentClass<RouteProps> & LoadableComponent)
-    | (React.StatelessComponent<RouteProps> & LoadableComponent);
+    | (React.ComponentClass<{}> & LoadableComponent)
+    | (React.StatelessComponent<{}> & LoadableComponent);
 };
 
 const authRequired = ({
@@ -62,9 +62,11 @@ const authRequired = ({
 };
 
 const AuthRequired = connect<FromReduxState, {}, RouteProps, ReduxState>(
-  state => ({
-    jwt: getUser(state).jwt
-  })
+  state => {
+    return {
+      jwt: getUser(state).jwt
+    };
+  }
 )(authRequired);
 
 const redirectToLogin = () => <Redirect to={LOGIN_URL} />;

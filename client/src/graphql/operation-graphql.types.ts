@@ -5,8 +5,21 @@ import {
   LoginMutationVariables,
   LoginMutation,
   SignupMutation,
-  SignupMutationVariables
-} from "./operation-result-types";
+  SignupMutationVariables,
+  CreateExperienceFieldsCollectionMutation,
+  CreateExperienceFieldsCollectionMutationVariables
+} from "./operation-result.types";
+
+export type CreateExperienceFieldsMutationFunc = MutationFunc<
+  CreateExperienceFieldsCollectionMutation,
+  CreateExperienceFieldsCollectionMutationVariables
+>;
+
+export type CreateExperienceFieldsMutationProps = CreateExperienceFieldsMutationFunc & {
+  create: (
+    params: CreateExperienceFieldsCollectionMutationVariables
+  ) => Promise<ApolloQueryResult<CreateExperienceFieldsCollectionMutation>>;
+};
 
 export type LoginMutationFunc = MutationFunc<
   LoginMutation,

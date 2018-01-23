@@ -2,14 +2,11 @@ import * as React from "react";
 import {
   Field,
   reduxForm,
-  WrappedFieldProps,
   InjectedFormProps,
   SubmissionError
 } from "redux-form";
-import TextField from "material-ui/TextField";
 import RaisedButton from "material-ui/RaisedButton";
 import jss from "jss";
-import { orange500, green500 } from "material-ui/styles/colors";
 import { RouteComponentProps, Link } from "react-router-dom";
 import { graphql, ChildProps, compose } from "react-apollo";
 import { connect } from "react-redux";
@@ -28,17 +25,22 @@ import {
   LoginMutationVariables,
   SignupMutation,
   SignupMutationVariables
-} from "../graphql/operation-result-types";
+} from "../graphql/operation-result.types";
 import {
   LoginMutationProps,
   LoginMutationFunc,
   SignupMutationProps,
   SignupMutationFunc
-} from "../graphql/operation-graphql-types";
+} from "../graphql/operation-graphql.types";
 import {
   setCurrentUser,
   SetCurrentUserActionFunc
 } from "../actions/auth.action";
+import { ValidationError } from "../utils";
+import {
+  renderTextField,
+  renderServerError
+} from "../components/form-utils.component";
 
 const processGraphQlError = (error: string) => {
   const pattern = /(\[.+:\s.+\])/g;
@@ -63,7 +65,7 @@ const processGraphQlError = (error: string) => {
 };
 
 const styles = {
-  container: {
+  signin: {
     display: "flex",
     flex: 1,
     alignItems: "center",
@@ -79,18 +81,6 @@ const styles = {
     marginTop: "20px"
   },
 
-  errorStyle: {
-    color: orange500
-  },
-
-  errorUnderlineStyle: {
-    borderColor: orange500
-  },
-
-  fieldValidUnderlineStyle: {
-    borderColor: green500
-  },
-
   routeSwitch: {
     display: "block"
   },
@@ -98,13 +88,6 @@ const styles = {
   link: {
     marginTop: "20px",
     display: "block"
-  },
-
-  serverError: {
-    border: `1px solid ${orange500}`,
-    color: orange500,
-    padding: "8px",
-    borderRadius: "2px"
   }
 };
 
@@ -122,10 +105,6 @@ interface FormData {
   email?: string;
   password?: string;
   passwordConfirm?: string;
-}
-
-interface ValidationError {
-  [key: string]: string;
 }
 
 const validate = (values: FormData) => {
@@ -153,39 +132,6 @@ const validate = (values: FormData) => {
   }
 
   return errors;
-};
-
-interface RenderArg {
-  label: string;
-}
-
-const renderTextField: React.StatelessComponent<
-  WrappedFieldProps & RenderArg
-> = props => {
-  const { input, label, meta: { error, dirty }, ...custom } = props;
-  const underlineStyle = () => {
-    if (dirty && error) {
-      return styles.errorUnderlineStyle;
-    }
-
-    if (dirty && !error) {
-      return styles.fieldValidUnderlineStyle;
-    }
-
-    return undefined;
-  };
-
-  return (
-    <TextField
-      hintText={label}
-      floatingLabelText={label}
-      errorText={dirty && error}
-      errorStyle={styles.errorStyle}
-      underlineStyle={underlineStyle()}
-      {...input}
-      {...custom}
-    />
-  );
 };
 
 interface FromReduxState {
@@ -265,13 +211,10 @@ const signin = (props: SigninProps) => {
     return undefined;
   };
 
-  const renderServerError = () =>
-    error ? <div className={`${classes.serverError}`}>{error}</div> : undefined;
-
   return (
-    <div className={classes.container}>
+    <div className={classes.signin}>
       <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
-        {renderServerError()}
+        {renderServerError(error)}
 
         <div>
           <Field
