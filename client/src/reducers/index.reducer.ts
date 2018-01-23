@@ -10,14 +10,21 @@ import {
   auth
 } from "./auth.reducer";
 
+import { SetExperienceFieldsCollectionAction } from "./experience.reducer";
+
 export enum ActionTypeKeys {
   SET_CURRENT_USER = "SET_CURRENT_USER",
   LOGOUT = "LOGOUT",
   REHYDRATE = "persist/REHYDRATE",
-  OTHER_ACTION = "__@chatty_any_other_action__"
+  OTHER_ACTION = "__@chatty_any_other_action__",
+  ADD_EXPERIENCE = "ADD_EXPERIENCE"
 }
 
-export type ActionType = SetCurrentUserAction | LogoutAction | RehydrateAction;
+export type ActionType =
+  | SetCurrentUserAction
+  | LogoutAction
+  | RehydrateAction
+  | SetExperienceFieldsCollectionAction;
 
 export type ReduxState = FormStateMap & {
   auth: AuthState;
