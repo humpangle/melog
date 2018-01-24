@@ -70,3 +70,24 @@ export const renderTextField: FieldComponent = props => {
 
 export const renderServerError = (error: string) =>
   error ? <div className={`${classes.serverError}`}>{error}</div> : undefined;
+
+type FormTextFieldProps = TextFieldProps &
+  WrappedFieldProps & { [key: string]: {} };
+
+export class FormTextField extends React.Component<FormTextFieldProps> {
+  render() {
+    const { input, label, meta: { error, dirty }, ...custom } = this.props;
+
+    return (
+      <TextField
+        hintText={label}
+        floatingLabelText={label}
+        errorText={dirty && error}
+        errorStyle={formUtilsStyles.errorStyle}
+        underlineStyle={inputUnderlineStyle(dirty && error, dirty && !error)}
+        {...input}
+        {...custom}
+      />
+    );
+  }
+}

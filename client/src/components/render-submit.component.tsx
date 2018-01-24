@@ -40,6 +40,7 @@ const { classes } = jss.createStyleSheet(styles).attach();
 interface OtherProps {
   text: string;
   className?: string;
+  focusOnReset?: () => void;
 }
 
 type Props = OtherProps & Partial<InjectedFormProps>;
@@ -50,32 +51,43 @@ const RenderSubmit = ({
   pristine,
   invalid,
   className,
-  text
-}: Props) => (
-  <div className={`${classes.container} ${className || ""}`}>
-    <RaisedButton
-      primary={true}
-      className={`${classes.submit}`}
-      type="submit"
-      disabled={pristine || invalid || submitting}
-    >
-      {text}
-      <RefreshIndicator
-        size={30}
-        left={45}
-        top={3}
-        status={submitting ? "loading" : "hide"}
-        style={styles.refresh}
-      />
-    </RaisedButton>
-    <RaisedButton
-      className={`${classes.reset}`}
-      disabled={submitting}
-      onClick={reset}
-    >
-      Reset
-    </RaisedButton>
-  </div>
-);
+  text,
+  focusOnReset = () => undefined
+}: Props) => {
+  const onClickReset = () => {
+    if (reset) {
+      reset();
+    }
+
+    setTimeout(focusOnReset);
+  };
+
+  return (
+    <div className={`${classes.container} ${className || ""}`}>
+      <RaisedButton
+        primary={true}
+        className={`${classes.submit}`}
+        type="submit"
+        disabled={pristine || invalid || submitting}
+      >
+        {text}
+        <RefreshIndicator
+          size={30}
+          left={45}
+          top={3}
+          status={submitting ? "loading" : "hide"}
+          style={styles.refresh}
+        />
+      </RaisedButton>
+      <RaisedButton
+        className={`${classes.reset}`}
+        disabled={submitting}
+        onClick={onClickReset}
+      >
+        Reset
+      </RaisedButton>
+    </div>
+  );
+};
 
 export default RenderSubmit;

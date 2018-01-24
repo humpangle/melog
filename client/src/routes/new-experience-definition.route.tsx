@@ -9,7 +9,9 @@ import {
   WrappedFieldProps,
   WrappedFieldArrayProps,
   FieldsProps,
-  SubmissionError
+  SubmissionError,
+  focus,
+  FormAction
 } from "redux-form";
 import SelectField from "material-ui/SelectField";
 import MenuItem from "material-ui/MenuItem";
@@ -17,7 +19,7 @@ import Paper from "material-ui/Paper";
 import IconButton from "material-ui/IconButton";
 import FlatButton from "material-ui/FlatButton";
 import ContentAdd from "material-ui/svg-icons/content/add";
-import ContentDelete from "material-ui/svg-icons/action/delete";
+import ContentDelete from "material-ui/svg-icons/navigation/close";
 import { RouteComponentProps } from "react-router-dom";
 import { graphql, ChildProps, compose } from "react-apollo";
 import { connect } from "react-redux";
@@ -29,13 +31,15 @@ import {
   NEW_EXPERIENCE_DEFINITION_FORM_NAME,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  ROOT_URL
+  ROOT_URL,
+  HEADER_BG_COLOR
 } from "../constants";
 import {
   renderTextField,
   renderServerError,
   inputUnderlineStyle,
-  formUtilsStyles
+  formUtilsStyles,
+  FormTextField
 } from "../components/form-utils.component";
 import CREATE_EXPERIENCE_FIELD_MUTATION from "../graphql/create-experience-fields-collection.mutation";
 import {
@@ -68,11 +72,20 @@ const styles = {
     marginBottom: "15px"
   },
 
-  field: {
-    padding: "10px",
+  fieldContainer: {
     marginBottom: 20,
     marginTop: 10,
     position: POSITION_RELATIVE
+  },
+
+  fieldControl: {
+    padding: "10px"
+  },
+
+  fieldHeader: {
+    color: "#fff",
+    backgroundColor: HEADER_BG_COLOR,
+    padding: "6px"
   },
 
   fieldStyle: {
@@ -166,9 +179,15 @@ const validate = (values: FormData) => {
   return errors;
 };
 
+interface FromReduxDispatch {
+  focus: (form: string, field: string) => FormAction;
+}
+
 type OwnProps = RouteComponentProps<{}> & InjectedFormProps<FormData, {}>;
 
-type InputProps = OwnProps & CreateExperienceFieldsMutationProps;
+type InputProps = OwnProps &
+  CreateExperienceFieldsMutationProps &
+  FromReduxDispatch;
 
 type NewExperienceDefinitionProps = ChildProps<
   InputProps,
@@ -190,6 +209,7 @@ export class NewExperienceDefinition extends React.Component<
     this.renderSelect = this.renderSelect.bind(this);
     this.renderFields = this.renderFields.bind(this);
     this.renderField = this.renderField.bind(this);
+    this.focusOnReset = this.focusOnReset.bind(this);
     this.state = { fields: {} };
   }
   async onSubmit(values: FormData) {
@@ -262,18 +282,21 @@ export class NewExperienceDefinition extends React.Component<
 
           <div>
             <Field
+              // https://splitme.net/expense/add
               name="experience.title"
               label="Experience title"
+              hintText="E.g. Food"
               autoFocus={true}
               autoComplete="off"
-              component={renderTextField}
+              component={FormTextField}
             />
           </div>
 
           <div>
             <Field
               name="experience.intro"
-              label="Short introduction of experience"
+              label="Introduction"
+              hintText="E.g. To document my eating habits"
               autoComplete="off"
               multiLine={true}
               component={renderTextField}
@@ -286,13 +309,18 @@ export class NewExperienceDefinition extends React.Component<
             className={classes.submitBtn}
             reset={reset}
             submitting={submitting}
-            text="Submit"
+            text="Save"
             pristine={pristine}
             invalid={invalid}
+            focusOnReset={this.focusOnReset}
           />
         </form>
       </div>
     );
+  }
+
+  focusOnReset() {
+    this.props.focus(NEW_EXPERIENCE_DEFINITION_FORM_NAME, "experience.title");
   }
 
   renderSelect({ input, meta: { error, dirty } }: WrappedFieldProps) {
@@ -367,26 +395,24 @@ export class NewExperienceDefinition extends React.Component<
         style={styles.fieldStyle}
         zDepth={1}
         rounded={false}
-        className={`${classes.field}`}
+        className={`${classes.fieldContainer}`}
       >
-        <div>
+        <div className={`${classes.fieldHeader}`}>
           <span>{`Field #${index + 1}`}</span>
 
           <IconButton style={styles.fieldDelete} onClick={onClick}>
-            <ContentDelete color="#696969de" />
+            <ContentDelete color="#fff" />
           </IconButton>
         </div>
 
-        <div>
+        <div className={`${classes.fieldControl}`}>
           <Field
             name={`${name}.name`}
             label="Field name"
             autoComplete="off"
             component={renderTextField}
           />
-        </div>
 
-        <div>
           <Field
             name={`${name}.fieldType`}
             value={this.state.fields.fieldType}
@@ -403,7 +429,7 @@ const newExperienceDefinitionForm = reduxForm<FormData>({
   form: NEW_EXPERIENCE_DEFINITION_FORM_NAME
 });
 
-const fromRedux = connect<{}, {}, OwnProps, {}>(null);
+const fromRedux = connect<{}, FromReduxDispatch, OwnProps, {}>(null, { focus });
 
 const graphqlCreate = graphql<
   CreateExperienceFieldsCollectionMutation,

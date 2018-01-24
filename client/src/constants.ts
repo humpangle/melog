@@ -7,3 +7,4 @@ export const NEW_EXPERIENCE_DEFINITION_FORM_NAME =
   "NEW_EXPERIENCE_DEFINITION_FORM";
 export const POSITION_ABSOLUTE = "absolute" as "absolute";
 export const POSITION_RELATIVE = "relative" as "relative";
+export const HEADER_BG_COLOR = "#24282e";
