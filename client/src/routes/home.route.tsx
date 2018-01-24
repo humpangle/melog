@@ -30,12 +30,14 @@ const styles = {
     right: 0,
     marginRight: "20px",
     marginBottom: "20px",
-    opacity: 0,
-    transition: "opacity 1s",
+    transform: "scale(0, 0)",
+    transformOrigin: "bottom right",
+    transition: "transform 1s",
 
     "&.show": {
-      opacity: 1,
-      transition: "opacity 2s"
+      transform: "scale(1, 1)",
+      transformOrigin: "bottom right",
+      transition: "transform 0.8s"
     }
   },
 
