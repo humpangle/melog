@@ -9,9 +9,7 @@ import {
   WrappedFieldProps,
   WrappedFieldArrayProps,
   FieldsProps,
-  SubmissionError,
-  focus,
-  FormAction
+  SubmissionError
 } from "redux-form";
 import SelectField from "material-ui/SelectField";
 import MenuItem from "material-ui/MenuItem";
@@ -35,7 +33,6 @@ import {
   HEADER_BG_COLOR
 } from "../constants";
 import {
-  renderTextField,
   renderServerError,
   inputUnderlineStyle,
   formUtilsStyles,
@@ -180,7 +177,7 @@ const validate = (values: FormData) => {
 };
 
 interface FromReduxDispatch {
-  focus: (form: string, field: string) => FormAction;
+  focus: null;
 }
 
 type OwnProps = RouteComponentProps<{}> & InjectedFormProps<FormData, {}>;
@@ -202,6 +199,8 @@ export class NewExperienceDefinition extends React.Component<
   NewExperienceDefinitionProps,
   State
 > {
+  experienceTitleRef: Field;
+
   constructor(props: NewExperienceDefinitionProps) {
     super(props);
     this.onSubmit = this.onSubmit.bind(this);
@@ -210,6 +209,7 @@ export class NewExperienceDefinition extends React.Component<
     this.renderFields = this.renderFields.bind(this);
     this.renderField = this.renderField.bind(this);
     this.focusOnReset = this.focusOnReset.bind(this);
+    this.makeExperienceTitleRef = this.makeExperienceTitleRef.bind(this);
     this.state = { fields: {} };
   }
   async onSubmit(values: FormData) {
@@ -288,6 +288,8 @@ export class NewExperienceDefinition extends React.Component<
               hintText="E.g. Food"
               autoFocus={true}
               autoComplete="off"
+              withRef={true}
+              ref={this.makeExperienceTitleRef}
               component={FormTextField}
             />
           </div>
@@ -299,7 +301,7 @@ export class NewExperienceDefinition extends React.Component<
               hintText="E.g. To document my eating habits"
               autoComplete="off"
               multiLine={true}
-              component={renderTextField}
+              component={FormTextField}
             />
           </div>
 
@@ -319,8 +321,16 @@ export class NewExperienceDefinition extends React.Component<
     );
   }
 
+  makeExperienceTitleRef(c: Field) {
+    this.experienceTitleRef = c;
+  }
+
   focusOnReset() {
-    this.props.focus(NEW_EXPERIENCE_DEFINITION_FORM_NAME, "experience.title");
+    const component = this.experienceTitleRef.getRenderedComponent() as FormTextField;
+
+    if (component && component.textField && component.textField) {
+      component.textField.focus();
+    }
   }
 
   renderSelect({ input, meta: { error, dirty } }: WrappedFieldProps) {
@@ -410,7 +420,7 @@ export class NewExperienceDefinition extends React.Component<
             name={`${name}.name`}
             label="Field name"
             autoComplete="off"
-            component={renderTextField}
+            component={FormTextField}
           />
 
           <Field
@@ -429,7 +439,7 @@ const newExperienceDefinitionForm = reduxForm<FormData>({
   form: NEW_EXPERIENCE_DEFINITION_FORM_NAME
 });
 
-const fromRedux = connect<{}, FromReduxDispatch, OwnProps, {}>(null, { focus });
+const fromRedux = connect<{}, FromReduxDispatch, OwnProps, {}>(null);
 
 const graphqlCreate = graphql<
   CreateExperienceFieldsCollectionMutation,

@@ -38,7 +38,7 @@ import {
 } from "../actions/auth.action";
 import { ValidationError } from "../utils";
 import {
-  renderTextField,
+  FormTextField,
   renderServerError
 } from "../components/form-utils.component";
 
@@ -202,7 +202,7 @@ const signin = (props: SigninProps) => {
             type="password"
             name="passwordConfirm"
             label="Repeat Password"
-            component={renderTextField}
+            component={FormTextField}
           />
         </div>
       );
@@ -222,7 +222,7 @@ const signin = (props: SigninProps) => {
             label="Email"
             autoFocus={true}
             autoComplete="off"
-            component={renderTextField}
+            component={FormTextField}
           />
         </div>
 
@@ -231,7 +231,7 @@ const signin = (props: SigninProps) => {
             type="password"
             name="password"
             label="Password"
-            component={renderTextField}
+            component={FormTextField}
           />
         </div>
 
