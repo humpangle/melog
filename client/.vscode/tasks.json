@@ -80,9 +80,16 @@
       "problemMatcher": []
     },
     {
-      "label": "Edit browser.d.ts",
+      "label": "Edit browser.d.ts deb",
       "type": "shell",
       "command": "cat .browser.d.tsa  > node_modules/react-apollo/browser.d.ts",
+      "problemMatcher": []
+    },
+    {
+      "label": "Edit browser.d.ts win",
+      "type": "shell",
+      "command":
+        "type .browser.d.tsa  > node_modules\\react-apollo\\browser.d.ts",
       "problemMatcher": []
     }
   ]
