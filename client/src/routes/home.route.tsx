@@ -6,7 +6,10 @@ import jss from "jss";
 import { RouteComponentProps, Link } from "react-router-dom";
 import { ChildProps, graphql, compose } from "react-apollo";
 import { connect } from "react-redux";
-import { List, ListItem } from "material-ui/List";
+// import {
+//   List
+//   // ListItem
+// } from "material-ui/List";
 import Avatar from "material-ui/Avatar";
 import randomColor from "randomcolor";
 
@@ -68,6 +71,32 @@ const styles = {
     textAlign: "center",
     height: "100%",
     flex: 1
+  },
+
+  experiencesContainer: {
+    boxShadow:
+      "0px 1px 5px 0px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 3px 1px -2px rgba(0, 0, 0, 0.12)",
+    background: "#fff"
+  },
+
+  experienceItemContainer: {
+    display: "flex",
+    padding: 5,
+    "&:hover": {
+      background: "#e8e2e2"
+    },
+    margin: 5,
+    cursor: "pointer"
+  },
+
+  experienceItem: {
+    flex: 1,
+    margin: "5px 0 0 10px",
+    borderBottom: "1px solid #dccfcf"
+  },
+
+  experienceItemLast: {
+    borderBottom: "none"
   }
 };
 
@@ -95,33 +124,27 @@ type AnExperience = ExperienceFragmentFragment & {
 interface ExperienceComponentProps {
   experience: AnExperience;
   index: number;
+  isLast: boolean;
 }
 
 class ExperienceComponent extends React.PureComponent<
   ExperienceComponentProps
 > {
   render() {
-    const { id, title, intro = "" } = this.props.experience;
-
-    const avatar = (
-      <Avatar backgroundColor={randomColor()}>
-        {title.slice(0, 2).toUpperCase()}
-      </Avatar>
-    );
-
-    const nestedItems = [
-      // tslint:disable-next-line:jsx-key
-      <ListItem key={`intro-${id}`} secondaryText={intro} />
-    ];
+    const { id, title } = this.props.experience;
+    const className = `${classes.experienceItem} ${
+      this.props.isLast ? classes.experienceItemLast : ""
+    } `;
 
     return (
-      <ListItem
-        key={id}
-        leftAvatar={avatar}
-        primaryText={title.slice(0, 30)}
-        nestedItems={nestedItems}
-        autoGenerateNestedIndicator={true}
-      />
+      <div key={id} className={`${classes.experienceItemContainer}`}>
+        <Avatar backgroundColor={randomColor()}>
+          {title.slice(0, 2).toUpperCase()}
+        </Avatar>
+        <div className={className}>
+          <span>{title.slice(0, 30)}</span>
+        </div>
+      </div>
     );
   }
 }
@@ -142,7 +165,11 @@ class ExperiencesList extends React.PureComponent<ExperiencesListProps> {
   }
 
   render() {
-    return <List>{this.props.experiences.map(this.renderExperience)}</List>;
+    return (
+      <div className={`${classes.experiencesContainer}`}>
+        {this.props.experiences.map(this.renderExperience)}
+      </div>
+    );
   }
 
   renderExperience(experience: AnExperience, index: number) {
@@ -151,6 +178,7 @@ class ExperiencesList extends React.PureComponent<ExperiencesListProps> {
         key={experience.id + index}
         experience={experience}
         index={index}
+        isLast={this.experiencesLen - 1 === index}
       />
     );
   }
