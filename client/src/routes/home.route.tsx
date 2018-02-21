@@ -92,26 +92,16 @@ type AnExperience = ExperienceFragmentFragment & {
   fields: FieldFragmentFragment[];
 };
 
-interface ExperiencesListProps {
-  experiences: AnExperience[];
+interface ExperienceComponentProps {
+  experience: AnExperience;
+  index: number;
 }
 
-class ExperiencesList extends React.PureComponent<ExperiencesListProps> {
-  experiencesLen: number;
-
-  constructor(props: ExperiencesListProps) {
-    super(props);
-    this.renderExperience = this.renderExperience.bind(this);
-
-    this.experiencesLen = props.experiences.length;
-  }
-
+class ExperienceComponent extends React.PureComponent<
+  ExperienceComponentProps
+> {
   render() {
-    return <List>{this.props.experiences.map(this.renderExperience)}</List>;
-  }
-
-  renderExperience(experience: AnExperience, index: number) {
-    const { id, title, intro = "" } = experience;
+    const { id, title, intro = "" } = this.props.experience;
 
     const avatar = (
       <Avatar backgroundColor={randomColor()}>
@@ -131,6 +121,36 @@ class ExperiencesList extends React.PureComponent<ExperiencesListProps> {
         primaryText={title.slice(0, 30)}
         nestedItems={nestedItems}
         autoGenerateNestedIndicator={true}
+      />
+    );
+  }
+}
+
+interface ExperiencesListProps {
+  experiences: AnExperience[];
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class ExperiencesList extends React.PureComponent<ExperiencesListProps> {
+  experiencesLen: number;
+
+  constructor(props: ExperiencesListProps) {
+    super(props);
+    this.renderExperience = this.renderExperience.bind(this);
+
+    this.experiencesLen = props.experiences.length;
+  }
+
+  render() {
+    return <List>{this.props.experiences.map(this.renderExperience)}</List>;
+  }
+
+  renderExperience(experience: AnExperience, index: number) {
+    return (
+      <ExperienceComponent
+        key={experience.id + index}
+        experience={experience}
+        index={index}
       />
     );
   }
