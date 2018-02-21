@@ -8,6 +8,7 @@ import jss from "jss";
 import preset from "jss-preset-default";
 import { ApolloProvider } from "react-apollo";
 import { PersistGate } from "redux-persist/es/integration/react";
+import injectTapEventPlugin from "react-tap-event-plugin";
 
 import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
@@ -15,6 +16,7 @@ import "./index.css";
 import configureStore from "./store";
 import { client } from "./apollo-setup";
 
+injectTapEventPlugin();
 jss.setup(preset());
 
 const theme = getMuiTheme(darkBaseTheme);

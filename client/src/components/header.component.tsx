@@ -42,7 +42,7 @@ const renderTitle = (title: string) => (
   <span style={styles.title}>{title}</span>
 );
 
-const DefaultIconLeft = () => (
+const defaultIconLeft = (
   <Link to={ROOT_URL}>
     <IconButton>
       <NavigationBack color="#fff" />
@@ -57,7 +57,7 @@ type HeaderProps = RouteComponentProps<{}> & {
 
 const header = ({
   title = "Melog",
-  iconLeft = <DefaultIconLeft />,
+  iconLeft = defaultIconLeft,
   match: { url }
 }: HeaderProps) => (
   <AppBar

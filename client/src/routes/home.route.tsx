@@ -4,9 +4,21 @@ import ContentAdd from "material-ui/svg-icons/content/add";
 import ContentClear from "material-ui/svg-icons/content/clear";
 import jss from "jss";
 import { RouteComponentProps, Link } from "react-router-dom";
+import { ChildProps, graphql, compose } from "react-apollo";
+import { connect } from "react-redux";
+import { List, ListItem } from "material-ui/List";
+import Avatar from "material-ui/Avatar";
+import randomColor from "randomcolor";
 
 import Header from "../components/header.component";
 import { NEW_EXPERIENCE_URL, POSITION_ABSOLUTE } from "../constants";
+import { ExperiencesQueryWithData } from "../graphql/operation-graphql.types";
+import {
+  ExperiencesQuery,
+  ExperienceFragmentFragment,
+  FieldFragmentFragment
+} from "../graphql/operation-result.types";
+import EXPERIENCES_QUERY from "../graphql/experiences.query";
 
 const styles = {
   home: {
@@ -75,12 +87,65 @@ const FloatingActions = ({ show }: { show: boolean }) => {
   );
 };
 
+type AnExperience = ExperienceFragmentFragment & {
+  fields: FieldFragmentFragment[];
+};
+
+interface ExperiencesListProps {
+  experiences: AnExperience[];
+}
+
+class ExperiencesList extends React.PureComponent<ExperiencesListProps> {
+  experiencesLen: number;
+
+  constructor(props: ExperiencesListProps) {
+    super(props);
+    this.renderExperience = this.renderExperience.bind(this);
+
+    this.experiencesLen = props.experiences.length;
+  }
+
+  render() {
+    return <List>{this.props.experiences.map(this.renderExperience)}</List>;
+  }
+
+  renderExperience(experience: AnExperience, index: number) {
+    const { id, title, intro = "" } = experience;
+
+    const avatar = (
+      <Avatar backgroundColor={randomColor()}>
+        {title.slice(0, 2).toUpperCase()}
+      </Avatar>
+    );
+
+    const nestedItems = [
+      // tslint:disable-next-line:jsx-key
+      <ListItem key={`intro-${id}`} secondaryText={intro} />
+    ];
+
+    return (
+      <ListItem
+        key={id}
+        leftAvatar={avatar}
+        primaryText={title.slice(0, 30)}
+        nestedItems={nestedItems}
+        autoGenerateNestedIndicator={true}
+      />
+    );
+  }
+}
+
 interface State {
   showFloatingActions: boolean;
 }
 
-type HomeProps = RouteComponentProps<{}>;
+type OwnProps = RouteComponentProps<{}>;
 
+type InputProps = ExperiencesQueryWithData & OwnProps;
+
+type HomeProps = ChildProps<InputProps, ExperiencesQuery>;
+
+// tslint:disable-next-line:max-classes-per-file
 export class Home extends React.Component<HomeProps, State> {
   state = { showFloatingActions: false };
 
@@ -98,9 +163,18 @@ export class Home extends React.Component<HomeProps, State> {
   }
 
   render() {
+    const { loading } = this.props;
+    const experiences = this.props.experiences as AnExperience[];
+
+    if (loading && !experiences) {
+      return <div>Loading</div>;
+    }
+
     return (
       <div className={classes.home}>
         <Header />
+
+        <ExperiencesList experiences={experiences} />
 
         <FloatingActionButton
           className={classes.floatingButton}
@@ -115,4 +189,16 @@ export class Home extends React.Component<HomeProps, State> {
   }
 }
 
-export default Home;
+const fromRedux = connect<{}, {}, OwnProps, {}>(null);
+
+const graphqlExperiences = graphql<ExperiencesQuery, InputProps>(
+  EXPERIENCES_QUERY,
+  {
+    props: props => {
+      const data = props.data as ExperiencesQueryWithData;
+      return data;
+    }
+  }
+);
+
+export default compose(fromRedux, graphqlExperiences)(Home);

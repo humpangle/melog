@@ -14,11 +14,9 @@ defmodule Melog.Factory do
   end
 
   def experience_factory do
-    next_sequence = sequence("")
-
     %{
-      title: "Experience title#{next_sequence}",
-      intro: "Experience intro#{next_sequence}"
+      title: Faker.Lorem.words() |> Enum.join("") |> String.capitalize(),
+      intro: Faker.Lorem.paragraph()
     }
   end
 

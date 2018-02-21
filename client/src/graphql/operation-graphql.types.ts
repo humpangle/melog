@@ -1,5 +1,5 @@
 import { ApolloQueryResult } from "apollo-client-preset";
-import { MutationFunc } from "react-apollo";
+import { MutationFunc, QueryProps } from "react-apollo";
 
 import {
   LoginMutationVariables,
@@ -7,8 +7,13 @@ import {
   SignupMutation,
   SignupMutationVariables,
   CreateExperienceFieldsCollectionMutation,
-  CreateExperienceFieldsCollectionMutationVariables
+  CreateExperienceFieldsCollectionMutationVariables,
+  ExperiencesQuery,
+  ExperiencesQueryVariables
 } from "./operation-result.types";
+
+export type ExperiencesQueryWithData = QueryProps<ExperiencesQueryVariables> &
+  ExperiencesQuery;
 
 export type CreateExperienceFieldsMutationFunc = MutationFunc<
   CreateExperienceFieldsCollectionMutation,

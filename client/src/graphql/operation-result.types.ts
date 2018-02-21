@@ -1,18 +1,6 @@
 /* tslint:disable */
 //  This file was automatically generated and should not be edited.
 
-// The possible data type for a field
-export enum FieldDataType {
-  BOOLEAN = "BOOLEAN", // A field value that may be true or false
-  DATE = "DATE", // A field value that must be a date
-  DATE_TIME = "DATE_TIME", // A field value that must be date time
-  DECIMAL = "DECIMAL", // A field value that must be a float
-  MULTI_TEXT = "MULTI_TEXT", // A field value that must be multi line text
-  NUMBER = "NUMBER", // A field value that must be an integer
-  SINGLE_TEXT = "SINGLE_TEXT", // A field value that must be single line text
-}
-
-
 export type CreateExperienceFieldsCollectionInput = {
   // Inputs for the experience to which the fields collection belongs
   experience: CreateExperienceInput,
@@ -38,6 +26,23 @@ export type SingleField = {
   name: string,
 };
 
+// The possible data type for a field
+export enum FieldDataType {
+  BOOLEAN = "BOOLEAN", // A field value that may be true or false
+  DATE = "DATE", // A field value that must be a date
+  DATE_TIME = "DATE_TIME", // A field value that must be date time
+  DECIMAL = "DECIMAL", // A field value that must be a float
+  MULTI_TEXT = "MULTI_TEXT", // A field value that must be multi line text
+  NUMBER = "NUMBER", // A field value that must be an integer
+  SINGLE_TEXT = "SINGLE_TEXT", // A field value that must be single line text
+}
+
+
+export type GetExperiencesInput = {
+  // For authentication if calling from non web context
+  jwt?: string | null,
+};
+
 export type LoginUserInput = {
   email: string,
   password: string,
@@ -61,14 +66,37 @@ export type CreateExperienceFieldsCollectionMutation = {
       id: string,
       title: string,
       intro: string | null,
+      insertedAt: string,
     } | null,
     // The list of fields belonging to same experience
     fields:  Array< {
       id: string,
       name: string,
       fieldType: FieldDataType,
+      insertedAt: string,
     } | null > | null,
   } | null,
+};
+
+export type ExperiencesQueryVariables = {
+  experience?: GetExperiencesInput | null,
+};
+
+export type ExperiencesQuery = {
+  // Get a list of experiences for a user
+  experiences:  Array< {
+    id: string,
+    title: string,
+    intro: string | null,
+    insertedAt: string,
+    // Contain different data about the experience
+    fields:  Array< {
+      id: string,
+      name: string,
+      fieldType: FieldDataType,
+      insertedAt: string,
+    } | null > | null,
+  } | null > | null,
 };
 
 export type LoginMutationVariables = {
@@ -101,12 +129,14 @@ export type FieldFragmentFragment = {
   id: string,
   name: string,
   fieldType: FieldDataType,
+  insertedAt: string,
 };
 
 export type ExperienceFragmentFragment = {
   id: string,
   title: string,
   intro: string | null,
+  insertedAt: string,
 };
 
 export type UserFragmentFragment = {
