@@ -8,8 +8,8 @@ import {
 } from "react-router-dom";
 import Loadable, { LoadableComponent } from "react-loadable";
 import { connect } from "react-redux";
+import jss from "jss";
 
-import "./App.css";
 import {
   SIGNUP_URL,
   LOGIN_URL,
@@ -18,21 +18,45 @@ import {
 } from "./constants";
 import { getUser, ReduxState } from "./reducers/index.reducer";
 
-const loading = () => <div>Loading..</div>;
+const styles = {
+  app: {
+    display: "flex",
+    height: "100%"
+  },
+
+  loadingIndicator: {
+    display: "flex",
+    flex: 1,
+    "justify-content": "center",
+    "align-items": "center",
+    background: "#757575",
+    color: "#fff",
+    "font-size": "1.5rem",
+    height: "100%"
+  }
+};
+
+const { classes } = jss.createStyleSheet(styles).attach();
+
+export const Loading = () => (
+  <div className={`${classes.loadingIndicator} ${classes.app}`}>
+    <div>Loading...</div>
+  </div>
+);
 
 const Signin = Loadable({
   loader: () => import("./routes/signin.route"),
-  loading
+  loading: Loading
 });
 
 const Home = Loadable({
   loader: () => import("./routes/home.route"),
-  loading
+  loading: Loading
 });
 
 const NewExperience = Loadable({
   loader: () => import("./routes/new-experience-definition.route"),
-  loading
+  loading: Loading
 });
 
 interface FromReduxState {
@@ -74,7 +98,7 @@ const redirectToLogin = () => <Redirect to={LOGIN_URL} />;
 class App extends React.Component {
   render() {
     return (
-      <div className="App">
+      <div className={`${classes.app}`}>
         <BrowserRouter>
           <Switch>
             <Route exact={true} path={SIGNUP_URL} component={Signin} />

@@ -19,6 +19,7 @@ import {
   FieldFragmentFragment
 } from "../graphql/operation-result.types";
 import EXPERIENCES_QUERY from "../graphql/experiences.query";
+import { Loading } from "../App";
 
 const styles = {
   home: {
@@ -167,7 +168,7 @@ export class Home extends React.Component<HomeProps, State> {
     const experiences = this.props.experiences as AnExperience[];
 
     if (loading && !experiences) {
-      return <div>Loading</div>;
+      return <Loading />;
     }
 
     return (
