@@ -12,6 +12,11 @@ import { connect } from "react-redux";
 // } from "material-ui/List";
 import Avatar from "material-ui/Avatar";
 import randomColor from "randomcolor";
+import { grey400 } from "material-ui/styles/colors";
+import IconButton from "material-ui/IconButton";
+import MoreVertIcon from "material-ui/svg-icons/navigation/more-vert";
+import IconMenu from "material-ui/IconMenu";
+import MenuItem from "material-ui/MenuItem";
 
 import Header from "../components/header.component";
 import { NEW_EXPERIENCE_URL, POSITION_ABSOLUTE } from "../constants";
@@ -92,15 +97,36 @@ const styles = {
   experienceItem: {
     flex: 1,
     margin: "5px 0 0 10px",
-    borderBottom: "1px solid #dccfcf"
+    borderBottom: "1px solid #dccfcf",
+    position: "relative"
   },
 
   experienceItemLast: {
     borderBottom: "none"
+  },
+
+  experienceItemMenuIcon: {
+    position: "absolute",
+    right: -15,
+    top: -15
   }
 };
 
 const { classes } = jss.createStyleSheet(styles).attach();
+
+const iconButtonElement = (
+  <IconButton touch={true} tooltip="more" tooltipPosition="bottom-left">
+    <MoreVertIcon color={grey400} />
+  </IconButton>
+);
+
+const RightIconMenu = () => (
+  <IconMenu iconButtonElement={iconButtonElement}>
+    <MenuItem>View</MenuItem>
+    <MenuItem>New</MenuItem>
+    <MenuItem>About</MenuItem>
+  </IconMenu>
+);
 
 const FloatingActions = ({ show }: { show: boolean }) => {
   return (
@@ -143,6 +169,9 @@ class ExperienceComponent extends React.PureComponent<
         </Avatar>
         <div className={className}>
           <span>{title.slice(0, 30)}</span>
+          <div className={`${classes.experienceItemMenuIcon}`}>
+            <RightIconMenu />
+          </div>
         </div>
       </div>
     );
