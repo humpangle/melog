@@ -199,6 +199,10 @@ defmodule MelogWeb.FieldSchema do
     field(:experience, :experience, resolve: assoc(:experience))
     field(:inserted_at, non_null(:iso_datetime))
     field(:updated_at, non_null(:iso_datetime))
+
+    field :slug, non_null(:string) do
+      resolve(&FieldResolver.slugify/3)
+    end
   end
 
   @desc "Object representing a fields collection i.e experience and a list of fields beloging to that experience"

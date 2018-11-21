@@ -1,7 +1,7 @@
 import { client } from "../apollo-setup";
 import { LogoutAction, SetCurrentUserAction } from "../reducers/auth.reducer";
 import { ActionTypeKeys } from "../reducers/index.reducer";
-import { UserFragmentFragment } from "../graphql/operation-result.types";
+import { UserFragmentFragment } from "../graphql/gen.types";
 
 export type LogoutActionFunc = () => LogoutAction;
 

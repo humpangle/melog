@@ -14,6 +14,7 @@ import {
   SIGNUP_URL,
   LOGIN_URL,
   ROOT_URL,
+  NEW_EXPERIENCE_DEF_URL,
   NEW_EXPERIENCE_URL
 } from "./constants";
 import { getUser, ReduxState } from "./reducers/index.reducer";
@@ -33,10 +34,19 @@ const styles = {
     color: "#fff",
     "font-size": "1.5rem",
     height: "100%"
+  },
+
+  appRoute: {
+    flex: 1,
+    display: "flex",
+    "flex-direction": "column",
+    height: "100%"
   }
 };
 
 const { classes } = jss.createStyleSheet(styles).attach();
+
+export const AppRouteClassName = classes.appRoute;
 
 export const Loading = () => (
   <div className={`${classes.loadingIndicator} ${classes.app}`}>
@@ -54,8 +64,13 @@ const Home = Loadable({
   loading: Loading
 });
 
-const NewExperience = Loadable({
+const NewExperienceDef = Loadable({
   loader: () => import("./routes/new-experience-definition.route"),
+  loading: Loading
+});
+
+const NewExperience = Loadable({
+  loader: () => import("./routes/new-experience.route"),
   loading: Loading
 });
 
@@ -104,11 +119,19 @@ class App extends React.Component {
             <Route exact={true} path={SIGNUP_URL} component={Signin} />
             <Route exact={true} path={LOGIN_URL} component={Signin} />
             <AuthRequired exact={true} path={ROOT_URL} authComponent={Home} />
+
+            <AuthRequired
+              exact={true}
+              path={NEW_EXPERIENCE_DEF_URL}
+              authComponent={NewExperienceDef}
+            />
+
             <AuthRequired
               exact={true}
               path={NEW_EXPERIENCE_URL}
               authComponent={NewExperience}
             />
+
             <Route render={redirectToLogin} />
           </Switch>
         </BrowserRouter>

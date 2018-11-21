@@ -38,6 +38,13 @@ export enum FieldDataType {
 }
 
 
+export type GetExperienceInput = {
+  id?: string | null,
+  // For authentication if calling from non web context
+  jwt?: string | null,
+  title?: string | null,
+};
+
 export type GetExperiencesInput = {
   // For authentication if calling from non web context
   jwt?: string | null,
@@ -74,28 +81,39 @@ export type CreateExperienceFieldsCollectionMutation = {
       name: string,
       fieldType: FieldDataType,
       insertedAt: string,
+      slug: string,
     } | null > | null,
   } | null,
 };
 
-export type ExperiencesQueryVariables = {
+export type ExperienceFieldsMetaOnlyQueryVariables = {
+  experience: GetExperienceInput,
+};
+
+export type ExperienceFieldsMetaOnlyQuery = {
+  // Get an experience by id or title or both
+  experience:  {
+    title: string,
+    // Contain different data about the experience
+    fields:  Array< {
+      name: string,
+      fieldType: FieldDataType,
+      slug: string,
+    } | null > | null,
+  } | null,
+};
+
+export type ExperiencesMinimalQueryVariables = {
   experience?: GetExperiencesInput | null,
 };
 
-export type ExperiencesQuery = {
+export type ExperiencesMinimalQuery = {
   // Get a list of experiences for a user
   experiences:  Array< {
     id: string,
     title: string,
     intro: string | null,
     insertedAt: string,
-    // Contain different data about the experience
-    fields:  Array< {
-      id: string,
-      name: string,
-      fieldType: FieldDataType,
-      insertedAt: string,
-    } | null > | null,
   } | null > | null,
 };
 
@@ -125,11 +143,20 @@ export type SignupMutation = {
   } | null,
 };
 
-export type FieldFragmentFragment = {
-  id: string,
+export type ExperienceFieldsMetaOnlyFieldFragmentFragment = {
   name: string,
   fieldType: FieldDataType,
-  insertedAt: string,
+  slug: string,
+};
+
+export type ExperienceFieldsMetaOnlyFragmentFragment = {
+  title: string,
+  // Contain different data about the experience
+  fields:  Array< {
+    name: string,
+    fieldType: FieldDataType,
+    slug: string,
+  } | null > | null,
 };
 
 export type ExperienceFragmentFragment = {
@@ -137,6 +164,14 @@ export type ExperienceFragmentFragment = {
   title: string,
   intro: string | null,
   insertedAt: string,
+};
+
+export type FieldFragmentFragment = {
+  id: string,
+  name: string,
+  fieldType: FieldDataType,
+  insertedAt: string,
+  slug: string,
 };
 
 export type UserFragmentFragment = {

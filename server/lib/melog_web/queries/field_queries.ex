@@ -165,6 +165,33 @@ defmodule MelogWeb.FieldQueries do
     """
   end
 
+  def mutation(:store_values) do
+    """
+    mutation StoreValues($data: StoreValuesInput!){
+      storeValues(data: $data) {
+        experience {
+          id
+        }
+
+        fields {
+          id
+          name
+          fieldType
+          dateTime
+          date
+          multi_text
+          single_text
+          decimal
+          boolean
+          number
+          insertedAt
+          updatedAt
+        }
+      }
+    }
+    """
+  end
+
   def query(:field) do
     """
     query GetField($field: GetFieldInput!) {

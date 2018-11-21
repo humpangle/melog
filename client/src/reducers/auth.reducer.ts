@@ -2,7 +2,7 @@ import Immutable from "seamless-immutable";
 import { Reducer } from "redux";
 
 import { ActionTypeKeys, ActionType } from "./index.reducer";
-import { UserFragmentFragment } from "../graphql/operation-result.types";
+import { UserFragmentFragment } from "../graphql/gen.types";
 
 export interface SetCurrentUserAction {
   type: ActionTypeKeys.SET_CURRENT_USER;

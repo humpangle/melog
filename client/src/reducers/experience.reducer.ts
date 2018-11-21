@@ -5,7 +5,7 @@ import { ActionTypeKeys, ActionType } from "./index.reducer";
 import {
   ExperienceFragmentFragment,
   FieldFragmentFragment
-} from "../graphql/operation-result.types";
+} from "../graphql/gen.types";
 
 export interface SetExperienceFieldsCollectionAction {
   type: ActionTypeKeys.ADD_EXPERIENCE;

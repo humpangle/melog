@@ -43,11 +43,11 @@ import {
   CreateExperienceFieldsCollectionMutation,
   CreateExperienceFieldsCollectionMutationVariables,
   FieldDataType
-} from "../graphql/operation-result.types";
+} from "../graphql/gen.types";
 import {
   CreateExperienceFieldsMutationFunc,
   CreateExperienceFieldsMutationProps
-} from "../graphql/operation-graphql.types";
+} from "../graphql/ops.types";
 
 const styles = {
   newExperience: {
@@ -328,8 +328,8 @@ export class NewExperienceDefinition extends React.Component<
   focusOnReset() {
     const component = this.experienceTitleRef.getRenderedComponent() as FormTextField;
 
-    if (component && component.textField && component.textField) {
-      component.textField.focus();
+    if (component && component.instance) {
+      component.instance.focus();
     }
   }
 

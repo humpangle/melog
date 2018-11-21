@@ -3,11 +3,7 @@ defmodule MelogWeb.FieldResolver do
   alias Melog.FieldApi, as: Api
   alias Melog.Experiences.{Field}
 
-  def create_field(
-        _root,
-        %{field: inputs},
-        %{context: %{current_user: _}} = _info
-      ) do
+  def create_field(_, %{field: inputs}, %{context: %{current_user: _}}) do
     create_a_field(inputs)
   end
 
@@ -40,11 +36,7 @@ defmodule MelogWeb.FieldResolver do
     end
   end
 
-  def store_value(
-        _root,
-        %{data: inputs},
-        %{context: %{current_user: _}} = _info
-      ) do
+  def store_value(_, %{data: inputs}, %{context: %{current_user: _}}) do
     store_a_value(inputs)
   end
 
@@ -90,11 +82,7 @@ defmodule MelogWeb.FieldResolver do
     end
   end
 
-  def field(
-        _root,
-        %{field: inputs},
-        %{context: %{current_user: user}} = _info
-      ) do
+  def field(_, %{field: inputs}, %{context: %{current_user: user}}) do
     get_field(user.id, inputs)
   end
 
@@ -191,8 +179,13 @@ defmodule MelogWeb.FieldResolver do
 
     case Api.create_experience_fields_collection(inputs_) do
       {:ok, result} ->
-        {experience, result_} = Map.pop(result, :experience)
-        fields = Enum.reduce(result_, [], fn {_, v}, acc -> [v | acc] end)
+        {experience, result_with_fields} = Map.pop(result, :experience)
+
+        fields =
+          Enum.reduce(result_with_fields, [], fn {_, v}, acc ->
+            [v | acc]
+          end)
+
         {:ok, %{experience: experience, fields: fields}}
 
       {:error, failed_operation, changeset, _success} ->
@@ -203,5 +196,9 @@ defmodule MelogWeb.FieldResolver do
           message: "{name: #{failed_operation}, error: #{changeset_string}}"
         }
     end
+  end
+
+  def slugify(%{name: name}, _, _) do
+    {:ok, Slugger.slugify_downcase(name)}
   end
 end

@@ -8,12 +8,21 @@ import {
   SignupMutationVariables,
   CreateExperienceFieldsCollectionMutation,
   CreateExperienceFieldsCollectionMutationVariables,
-  ExperiencesQuery,
-  ExperiencesQueryVariables
-} from "./operation-result.types";
+  ExperiencesMinimalQuery,
+  ExperiencesMinimalQueryVariables,
+  ExperienceFieldsMetaOnlyQuery,
+  ExperienceFieldsMetaOnlyQueryVariables
+} from "./gen.types";
 
-export type ExperiencesQueryWithData = QueryProps<ExperiencesQueryVariables> &
-  ExperiencesQuery;
+export type ExperiencesMinimalQueryWithData = QueryProps<
+  ExperiencesMinimalQueryVariables
+> &
+  ExperiencesMinimalQuery;
+
+export type ExperienceFieldsMetaOnlyQueryWithData = QueryProps<
+  ExperienceFieldsMetaOnlyQueryVariables
+> &
+  ExperienceFieldsMetaOnlyQuery;
 
 export type CreateExperienceFieldsMutationFunc = MutationFunc<
   CreateExperienceFieldsCollectionMutation,

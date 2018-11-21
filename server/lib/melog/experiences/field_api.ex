@@ -87,8 +87,8 @@ defmodule Melog.FieldApi do
       iex> create_experience_fields_collection(%{
         experience: %{intro: "intro", title: "title"},
         fields: [
-           %{name: "field1", field_type: "boolean"},
-            %{name: "field2", field_type: "number"}
+          %{name: "field1", field_type: "boolean"},
+          %{name: "field2", field_type: "number"}
         ]
       })
       {:ok, %{
@@ -99,8 +99,8 @@ defmodule Melog.FieldApi do
       iex> create_experience_fields_collection(%{
         experience: %{intro: "intro", title: "title"},
         fields: [
-           %{name: "field1", field_type: "boolean"},
-            %{name: "field2", field_type: "number"}
+          %{name: "field1", field_type: "boolean"},
+          %{name: "field2", field_type: "number"}
         ]
       })
       {
@@ -115,8 +115,8 @@ defmodule Melog.FieldApi do
       iex> create_experience_fields_collection(%{
         experience: %{intro: "intro", title: "title"},
         fields: [
-           %{name: "field1", field_type: "boolean"},
-            %{name: "field2", field_type: "number"}
+          %{name: "field1", field_type: "boolean"},
+          %{name: "field2", field_type: "number"}
         ]
       })
       {:error, :experience, %Ecto.Changeset{}, nil}
@@ -136,35 +136,29 @@ defmodule Melog.FieldApi do
         experience: experience,
         fields: fields_
       }) do
-    inserts =
-      Multi.new()
-      |> Multi.insert(
-        :experience,
-        ExperienceAPI.change_experience(%Experience{}, experience)
-      )
-      |> Multi.merge(fn %{experience: %Experience{id: id}} ->
-        [field0 | rest_fields] =
-          Enum.map(
-            fields_,
-            &Enum.into(&1, %{experience_id: id})
-          )
+    Multi.new()
+    |> Multi.insert(
+      :experience,
+      ExperienceAPI.change_experience(%Experience{}, experience)
+    )
+    |> Multi.merge(fn %{experience: %Experience{id: id}} ->
+      [field0 | rest_fields] = update_fields_with_experience_id(fields_, id)
 
-        multi0 = make_field_multi({field0, 0})
+      multi0 = make_field_multi({field0, 0})
 
-        rest_fields
-        |> Enum.with_index(1)
-        |> Enum.reduce(multi0, &Multi.append(&2, make_field_multi(&1)))
-      end)
+      Enum.with_index(rest_fields, 1)
+      |> Enum.reduce(multi0, &Multi.append(&2, make_field_multi(&1)))
+    end)
+    |> Repo.transaction()
+  end
 
-    Repo.transaction(inserts)
+  defp update_fields_with_experience_id(fields, id) do
+    Enum.map(fields, &Enum.into(&1, %{experience_id: id}))
   end
 
   defp make_field_multi({field, index}) do
     Multi.new()
-    |> Multi.insert(
-      Integer.to_string(index),
-      change_field(%Field{}, field)
-    )
+    |> Multi.insert(Integer.to_string(index), change_field(%Field{}, field))
   end
 
   @doc """

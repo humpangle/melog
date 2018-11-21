@@ -5,7 +5,7 @@ defmodule Melog.Mixfile do
     [
       app: :melog,
       version: "0.0.1",
-      elixir: "~> 1.6.0",
+      elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -54,7 +54,8 @@ defmodule Melog.Mixfile do
       {:bcrypt_elixir, "~> 1.0.5"},
       {:ecto_enum, "~> 1.1.0"},
       {:corsica, "~> 1.1"},
-      {:faker, "~> 0.9.0"}
+      {:faker, "~> 0.9.0"},
+      {:slugger, "~> 0.2"}
     ]
   end
 

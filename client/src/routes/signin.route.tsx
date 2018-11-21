@@ -25,13 +25,13 @@ import {
   LoginMutationVariables,
   SignupMutation,
   SignupMutationVariables
-} from "../graphql/operation-result.types";
+} from "../graphql/gen.types";
 import {
   LoginMutationProps,
   LoginMutationFunc,
   SignupMutationProps,
   SignupMutationFunc
-} from "../graphql/operation-graphql.types";
+} from "../graphql/ops.types";
 import {
   setCurrentUser,
   SetCurrentUserActionFunc

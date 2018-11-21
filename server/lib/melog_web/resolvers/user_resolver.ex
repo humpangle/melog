@@ -11,16 +11,8 @@ defmodule MelogWeb.UserResolver do
   @doc """
   Get a single user either by email or id or both.
   """
-  @spec user(
-          any,
-          %{
-            user: %{
-              id: nil | String.t() | integer,
-              email: nil | String.t()
-            }
-          },
-          any
-        ) :: {:ok, %User{}} | {:error, message: String.t()}
+  @spec user(any, %{user: %{id: nil | String.t() | integer, email: nil | String.t()}}, any) ::
+          {:ok, %User{}} | {:error, message: String.t()}
   def user(_root, %{user: get_user_params} = _args, _info) do
     case Accounts.get_user_by(get_user_params) do
       %User{} = user -> {:ok, user}
@@ -60,16 +52,8 @@ defmodule MelogWeb.UserResolver do
     end
   end
 
-  @spec login(
-          any,
-          %{
-            user: %{
-              email: String.t(),
-              password: String.t()
-            }
-          },
-          any
-        ) :: {:ok, %User{}} | {:error, message: String.t()}
+  @spec login(any, %{user: %{email: String.t(), password: String.t()}}, any) ::
+          {:ok, %User{}} | {:error, message: String.t()}
   def login(_root, %{user: login_params}, _info) do
     with {:ok, user} <- Accounts.authenticate_user(login_params),
          {:ok, jwt, _} <- MelogWeb.UserSerializer.encode_and_sign(user, %{}) do
@@ -112,18 +96,10 @@ defmodule MelogWeb.UserResolver do
     {:ok, email_}
   end
 
-  @spec is_same_user(
-          %{
-            id: String.t(),
-            email: String.t()
-          },
-          %{
-            id: String.t(),
-            email: String.t()
-          }
-        ) :: boolean
-  defp is_same_user(%{id: id1, email: email1}, %{id: id2, email: email2}) do
-    id1 == id2 && email1 == email2
+  @spec is_same_user(%{id: String.t(), email: String.t()}, %{id: String.t(), email: String.t()}) ::
+          boolean
+  defp is_same_user(%{id: id, email: email}, %{id: id, email: email}) do
+    true
   end
 
   defp is_same_user(_, _) do

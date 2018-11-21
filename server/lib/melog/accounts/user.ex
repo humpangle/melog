@@ -19,7 +19,7 @@ defmodule Melog.Accounts.User do
     autogenerate: {Timex.Ecto.DateTime, :autogenerate, []}
   ]
 
-  @mail_regex ~r/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/
+  @mail_regex ~r/@/
 
   schema "users" do
     field(:email, :string)

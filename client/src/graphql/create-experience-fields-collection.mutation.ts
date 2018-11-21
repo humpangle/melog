@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 
-import { fieldFragment, experienceFragment } from "./experiences.query";
+import experienceFragment from "./experience-minimal.fragment";
+import fieldFragment from "./field.fragment";
 
 export const createExperienceFieldsCollectionMutation = gql`
   mutation CreateExperienceFieldsCollection(

@@ -495,3 +495,227 @@ declare module "redux-persist/es/storage/session" {
   let sessionStorage: WebStorage;
   export default sessionStorage;
 }
+
+/// <reference types="react" />
+
+declare module "material-ui-datetimepicker" {
+  namespace propTypes {
+    type horizontal = "left" | "middle" | "right";
+    type tooltipHorizontal = "left" | "center" | "right";
+    type vertical = "top" | "center" | "bottom";
+    type direction = "left" | "right" | "up" | "down";
+
+    interface origin {
+      horizontal: horizontal;
+      vertical: vertical;
+    }
+
+    interface utils {
+      getWeekArray(
+        date: Date,
+        firstDayOfWeek: number
+      ): Array<Array<Date | null>>;
+      getYear(date: Date): number;
+      setYear(date: Date, year: number): Date;
+      addDays(date: Date, days: number): Date;
+      addMonths(date: Date, months: number): Date;
+      addYears(date: Date, years: number): Date;
+      getFirstDayOfMonth(date: Date): Date;
+      monthDiff(date1: Date, date2: Date): number;
+    }
+
+    type corners = "bottom-left" | "bottom-right" | "top-left" | "top-right";
+    type cornersAndCenter =
+      | "bottom-center"
+      | "bottom-left"
+      | "bottom-right"
+      | "top-center"
+      | "top-left"
+      | "top-right";
+  }
+
+  interface DatePickerProps {
+    // <TextField/> is the element that get the 'other' properties
+    DateTimeFormat?: typeof Intl.DateTimeFormat;
+    autoOk?: boolean;
+    cancelLabel?: React.ReactNode;
+    container?: "dialog" | "inline";
+    defaultDate?: Date;
+    dialogContainerStyle?: React.CSSProperties;
+    disableYearSelection?: boolean;
+    disabled?: boolean;
+    firstDayOfWeek?: number;
+    formatDate?(date: Date): string;
+    locale?: string;
+    maxDate?: Date;
+    minDate?: Date;
+    mode?: "portrait" | "landscape";
+    okLabel?: React.ReactNode;
+    onChange?(e: any, date: Date): void; // e is always null
+    onDismiss?(): void;
+    onFocus?: React.FocusEventHandler<{}>;
+    onShow?(): void;
+    onClick?: React.TouchEventHandler<{}>;
+    shouldDisableDate?(day: Date): boolean;
+    style?: React.CSSProperties;
+    textFieldStyle?: React.CSSProperties;
+    value?: Date;
+
+    // From <TextField />
+    className?: string;
+    defaultValue?: string;
+    errorStyle?: React.CSSProperties;
+    errorText?: React.ReactNode;
+    floatingLabelStyle?: React.CSSProperties;
+    floatingLabelText?: React.ReactNode;
+    fullWidth?: boolean;
+    hideCalendarDate?: boolean;
+    hintStyle?: React.CSSProperties;
+    hintText?: React.ReactNode;
+    id?: string;
+    inputStyle?: React.CSSProperties;
+    onBlur?: React.FocusEventHandler<{}>;
+    onKeyDown?: React.KeyboardEventHandler<{}>;
+    rows?: number;
+    rowsMax?: number;
+    name?: string;
+    type?: string;
+    underlineDisabledStyle?: React.CSSProperties;
+    underlineFocusStyle?: React.CSSProperties;
+    underlineShow?: boolean;
+    underlineStyle?: React.CSSProperties;
+    utils?: propTypes.utils;
+  }
+
+  interface TimePickerProps {
+    // <TextField/> is element that get the 'other' properties
+    autoOk?: boolean;
+    cancelLabel?: React.ReactNode;
+    defaultTime?: Date;
+    dialogBodyStyle?: React.CSSProperties;
+    dialogStyle?: React.CSSProperties;
+    disabled?: boolean;
+    format?: string;
+    minutesStep?: number;
+    okLabel?: React.ReactNode;
+    onChange?(e: any, time: Date): void;
+    onDismiss?(): void;
+    onFocus?: React.FocusEventHandler<{}>;
+    onShow?(): void;
+    onClick?: React.MouseEventHandler<{}>;
+    pedantic?: boolean;
+    style?: React.CSSProperties;
+    textFieldStyle?: React.CSSProperties;
+    value?: Date;
+
+    // From <TextField />
+    className?: string;
+    defaultValue?: string | number;
+    errorStyle?: React.CSSProperties;
+    errorText?: React.ReactNode;
+    floatingLabelFixed?: boolean;
+    floatingLabelFocusStyle?: React.CSSProperties;
+    floatingLabelStyle?: React.CSSProperties;
+    floatingLabelText?: React.ReactNode;
+    fullWidth?: boolean;
+    hintStyle?: React.CSSProperties;
+    hintText?: React.ReactNode;
+    id?: string;
+    inputStyle?: React.CSSProperties;
+    multiLine?: boolean;
+    name?: string;
+    onBlur?: React.FocusEventHandler<{}>;
+    onKeyDown?: React.KeyboardEventHandler<{}>;
+    rows?: number;
+    rowsMax?: number;
+    textareaStyle?: React.CSSProperties;
+    type?: string;
+    underlineDisabledStyle?: React.CSSProperties;
+    underlineFocusStyle?: React.CSSProperties;
+    underlineShow?: boolean;
+    underlineStyle?: React.CSSProperties;
+  }
+
+  type TComponent = React.StatelessComponent<any> | React.ComponentClass<any>;
+
+  type OtherProps = {
+    DatePicker: TComponent;
+    TimePicker: TComponent;
+    clearIcon: null | JSX.Element;
+    returnMomentDate?: boolean;
+    format: string;
+  };
+
+  export default class DateTimePicker extends React.Component<
+    OtherProps & DatePickerProps & TimePickerProps
+  > {
+    focus(): void;
+    openDialog(): void;
+  }
+}
+
+declare module "material-ui/TimePicker/TimePickerDialog" {
+  namespace propTypes {
+    type horizontal = "left" | "middle" | "right";
+    type tooltipHorizontal = "left" | "center" | "right";
+    type vertical = "top" | "center" | "bottom";
+    type direction = "left" | "right" | "up" | "down";
+
+    interface origin {
+      horizontal: horizontal;
+      vertical: vertical;
+    }
+
+    interface utils {
+      getWeekArray(
+        date: Date,
+        firstDayOfWeek: number
+      ): Array<Array<Date | null>>;
+      getYear(date: Date): number;
+      setYear(date: Date, year: number): Date;
+      addDays(date: Date, days: number): Date;
+      addMonths(date: Date, months: number): Date;
+      addYears(date: Date, years: number): Date;
+      getFirstDayOfMonth(date: Date): Date;
+      monthDiff(date1: Date, date2: Date): number;
+    }
+
+    type corners = "bottom-left" | "bottom-right" | "top-left" | "top-right";
+    type cornersAndCenter =
+      | "bottom-center"
+      | "bottom-left"
+      | "bottom-right"
+      | "top-center"
+      | "top-left"
+      | "top-right";
+  }
+
+  export interface TimePickerDialogProps {
+    // <Container/> is the element that get the 'other' properties
+    DateTimeFormat?: typeof Intl.DateTimeFormat;
+    animation?: React.ComponentClass<any>;
+    autoOk?: boolean;
+    cancelLabel?: React.ReactNode;
+    container?: "dialog" | "inline";
+    disableYearSelection?: boolean;
+    firstDayOfWeek?: number;
+    initialDate?: Date;
+    locale?: string;
+    maxDate?: Date;
+    minDate?: Date;
+    mode?: "portrait" | "landscape";
+    okLabel?: React.ReactNode;
+    onAccept?(d: Date): void;
+    onDismiss?(): void;
+    onShow?(): void;
+    shouldDisableDate?(day: Date): boolean;
+    style?: React.CSSProperties;
+    utils?: propTypes.utils;
+  }
+  export default class TimePickerDialog extends React.Component<
+    TimePickerDialogProps
+  > {
+    show(): void;
+    dismiss(): void;
+  }
+}

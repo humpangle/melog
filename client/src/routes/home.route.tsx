@@ -19,24 +19,21 @@ import IconMenu from "material-ui/IconMenu";
 import MenuItem from "material-ui/MenuItem";
 
 import Header from "../components/header.component";
-import { NEW_EXPERIENCE_URL, POSITION_ABSOLUTE } from "../constants";
-import { ExperiencesQueryWithData } from "../graphql/operation-graphql.types";
 import {
-  ExperiencesQuery,
+  NEW_EXPERIENCE_DEF_URL,
+  POSITION_ABSOLUTE,
+  makeNewExpUrl
+} from "../constants";
+import { ExperiencesMinimalQueryWithData } from "../graphql/ops.types";
+import {
+  ExperiencesMinimalQuery,
   ExperienceFragmentFragment,
   FieldFragmentFragment
-} from "../graphql/operation-result.types";
-import EXPERIENCES_QUERY from "../graphql/experiences.query";
-import { Loading } from "../App";
+} from "../graphql/gen.types";
+import EXPERIENCES_QUERY from "../graphql/experiences-minimal.query";
+import { Loading, AppRouteClassName } from "../App";
 
 const styles = {
-  home: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    height: "100%"
-  },
-
   floatingButton: {
     marginRight: "20px",
     marginBottom: "20px",
@@ -62,9 +59,10 @@ const styles = {
     }
   },
 
+  link: { textDecoration: "none" },
+
   floatingActionsLink: {
-    display: "flex",
-    textDecoration: "none"
+    display: "flex"
   },
 
   floatingActionsLabel: {
@@ -120,10 +118,18 @@ const iconButtonElement = (
   </IconButton>
 );
 
-const RightIconMenu = () => (
+interface RightIconMenuProps {
+  experienceId: string;
+}
+
+const RightIconMenu = ({ experienceId }: RightIconMenuProps) => (
   <IconMenu iconButtonElement={iconButtonElement}>
     <MenuItem>View</MenuItem>
-    <MenuItem>New</MenuItem>
+    <MenuItem>
+      <Link className={`${classes.link}`} to={makeNewExpUrl(experienceId)}>
+        New
+      </Link>
+    </MenuItem>
     <MenuItem>About</MenuItem>
   </IconMenu>
 );
@@ -131,7 +137,10 @@ const RightIconMenu = () => (
 const FloatingActions = ({ show }: { show: boolean }) => {
   return (
     <div className={`${classes.floatingActionsUl} ${show ? "show" : ""}`}>
-      <Link to={NEW_EXPERIENCE_URL} className={classes.floatingActionsLink}>
+      <Link
+        to={NEW_EXPERIENCE_DEF_URL}
+        className={`${classes.floatingActionsLink} ${classes.link}`}
+      >
         <div className={classes.floatingActionsLabel}>
           New experience definition
         </div>
@@ -170,7 +179,7 @@ class ExperienceComponent extends React.PureComponent<
         <div className={className}>
           <span>{title.slice(0, 30)}</span>
           <div className={`${classes.experienceItemMenuIcon}`}>
-            <RightIconMenu />
+            <RightIconMenu experienceId={id} />
           </div>
         </div>
       </div>
@@ -219,9 +228,9 @@ interface State {
 
 type OwnProps = RouteComponentProps<{}>;
 
-type InputProps = ExperiencesQueryWithData & OwnProps;
+type InputProps = ExperiencesMinimalQueryWithData & OwnProps;
 
-type HomeProps = ChildProps<InputProps, ExperiencesQuery>;
+type HomeProps = ChildProps<InputProps, ExperiencesMinimalQuery>;
 
 // tslint:disable-next-line:max-classes-per-file
 export class Home extends React.Component<HomeProps, State> {
@@ -249,7 +258,7 @@ export class Home extends React.Component<HomeProps, State> {
     }
 
     return (
-      <div className={classes.home}>
+      <div className={AppRouteClassName}>
         <Header />
 
         <ExperiencesList experiences={experiences} />
@@ -269,11 +278,11 @@ export class Home extends React.Component<HomeProps, State> {
 
 const fromRedux = connect<{}, {}, OwnProps, {}>(null);
 
-const graphqlExperiences = graphql<ExperiencesQuery, InputProps>(
+const graphqlExperiences = graphql<ExperiencesMinimalQuery, InputProps>(
   EXPERIENCES_QUERY,
   {
     props: props => {
-      const data = props.data as ExperiencesQueryWithData;
+      const data = props.data as ExperiencesMinimalQueryWithData;
       return data;
     }
   }
